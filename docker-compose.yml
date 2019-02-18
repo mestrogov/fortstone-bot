@@ -10,6 +10,9 @@ services:
       - BOT_TOKEN=${BOT_TOKEN}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+      - DAILY_STORE_URL=${DAILY_STORE_URL}
+      - FORTNITE_STATUS_URL=${FORTNITE_STATUS_URL}
+      - FORTNITE_NEWS_URL=${FORTNITE_NEWS_URL}
     depends_on:
       - redis
 

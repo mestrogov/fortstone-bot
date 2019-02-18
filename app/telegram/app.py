@@ -4,6 +4,7 @@ from app import config as config
 from pyrogram import Client, MessageHandler, Filters
 from app.telegram.commands.debug import debug as debug_command
 from app.telegram.commands.start import start as start_command
+from app.telegram.commands.status import status as status_command
 from app.telegram.handlers.message import message as message_handler
 
 
@@ -13,6 +14,7 @@ def get_client():
                         app_version="Fortniter v{0}".format(config.VERSION))
         client.add_handler(MessageHandler(start_command, Filters.command("start")))
         client.add_handler(MessageHandler(debug_command, Filters.command("debug")))
+        client.add_handler(MessageHandler(status_command, Filters.command("status")))
         # Этот MessageHandler должен быть обязательно последним
         client.add_handler(MessageHandler(message_handler))
 

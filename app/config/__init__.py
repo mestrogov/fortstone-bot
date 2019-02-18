@@ -8,7 +8,7 @@ import logging
 
 
 try:
-    # Глобальные настройки приложения
+    # Настройки приложения
     VERSION = str(getenv("VERSION", "Unknown"))
     COMMIT = str(run(["git log --pretty=format:'%h' -n 1"], shell=True, stdout=PIPE).stdout.decode("UTF-8"))
     DEVELOPER_MODE = parse_as_boolean(getenv("DEVELOPER_MODE", False))
@@ -16,6 +16,7 @@ try:
     API_ID = int(getenv("API_ID"))
     API_HASH = str(getenv("API_HASH"))
     BOT_TOKEN = str(getenv("BOT_TOKEN"))
+    CHANNEL_ID = str(getenv("CHANNEL_ID"))
 
     # Настройки Redis
     REDIS_HOST = str(getenv("REDIS_HOST", "127.0.0.1"))
