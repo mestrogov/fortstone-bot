@@ -1,0 +1,26 @@
+version: "2"
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      - VERSION=${VERSION}
+      - DEVELOPER_MODE=${DEVELOPER_MODE}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:5.0.3-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+networks:
+  default:
+
+volumes:
+  redis-data:
