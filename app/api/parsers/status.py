@@ -15,33 +15,36 @@ async def status():
         f_status = (await Redis.execute("GET", "fortnite:status"))['details']
         if not f_status:
             f_status = requests.get(api_status_url).json()
-            await Redis.execute("SET", "fortnite:status", json.dumps(f_status), "EX", 30)
+            await Redis.execute("SET", "fortnite:status", json.dumps(f_status), "EX", 15)
         else:
             f_status = json.loads(f_status)
 
         if f_status['status']['description'] == "All Systems Operational":
             f_status_message = "✅ Сервисы Epic Games работают в штатном режиме."
+        elif f_status['status']['description'] == "Partially Degraded Service":
+            f_status_message = "〽️ Некоторые из сервисов Epic Games работают с ухудшенной производительностью."
         elif f_status['status']['description'] == "Partial System Outage":
-            f_status_message = "⚠️ Некоторые из сервисов Epic Games работают с перебоями или вовсе не работают."
+            f_status_message = "⚠️ Некоторые из сервисов Epic Games не работают или работают с ошибками."
         elif f_status['status']['description'] == "Major Service Outage":
-            f_status_message = "❌ Большинство из сервисов Epic Games работают с перебоями или вовсе не работают."
+            f_status_message = "❌ Большинство из сервисов Epic Games не работают или работают с ошибками."
         else:
-            f_status_message = "⁉️ С сервисами Epic Games происходит нечто странное, похоже на какую-то " \
-                               "нештатную ситуацию."
+            f_status_message = "⁉️ С сервисами Epic Games происходит нечто странное (нештатная ситуация)."
         if f_status['components']:
             broken_services = [service for service in f_status['components'] if not service['status'] == "operational"]
             if broken_services:
-                f_status_message = "{0}\n\n⛔️ Сервисы, которые работают с перебоями или вовсе не работают:".format(
+                f_status_message = "{0}\n\n⛔️ Сервисы, которые **не** работают в штатном режиме:".format(
                     f_status_message)
-                for num, service in enumerate(f_status['components']):
+                num = 1
+                for service in f_status['components']:
                     if not service['status'] == "operational" and not service['group']:
-                        f_status_message = "{0}\n**{1}.** {2}, состояние: **{3}**.".format(
-                            f_status_message, num+1, translations.translate_service_name(service['name']),
+                        f_status_message = "{0}\n{1}. {2}, состояние: **{3}**.".format(
+                            f_status_message, num, translations.translate_service_name(service['name']),
                             translations.translate_service_status(service['status']))
+                        num += 1
         if f_status['scheduled_maintenances']:
             f_status_message = "{0}\n\n🕰 Запланированные технические работы:".format(f_status_message)
             for num, maintenance in enumerate(f_status['scheduled_maintenances']):
-                f_status_message = "{0}\n**{1}.** {2}, запланировано начало на **{3}** в **{4}**, " \
+                f_status_message = "{0}\n{1}. {2}, запланировано начало на **{3}** в **{4}**, " \
                                    "окончание на **{5}** в **{6}** UTC (московское время больше на 3 часа).".\
                     format(f_status_message, num+1, maintenance['name'])
         f_status_message = "{0}\n\nУзнать подробную информацию о работе сервисов Epic Games можно " \
