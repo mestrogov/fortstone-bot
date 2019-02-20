@@ -42,9 +42,11 @@ async def status():
                             translations.translate_service_status(service['status']))
                         num += 1
         if f_status['incidents']:
-            f_status_message = "{0}\n\n❗️ Происшествия, которые влияют на работу сервисов:".format(f_status_message)
+            f_status_message = "{0}\n\n❗️ Происшествия, из-за которых некоторые сервисы **не** работают в " \
+                               "штатном режиме:".format(f_status_message)
             for num, incident in enumerate(f_status['incidents']):
-                f_status_message = "{0}\n{1}. {2}.".format(f_status_message, num+1, incident['name'])
+                f_status_message = "{0}\n{1}. {2}, [подробнее]({3}).".format(
+                    f_status_message, num+1, incident['name'], incident['shortlink'])
         if f_status['scheduled_maintenances']:
             f_status_message = "{0}\n\n🕰 Запланированные технические работы:".format(f_status_message)
             for num, maintenance in enumerate(f_status['scheduled_maintenances']):
