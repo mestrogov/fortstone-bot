@@ -24,9 +24,9 @@ async def status():
         elif f_status['status']['description'] == "Partially Degraded Service":
             f_status_message = "〽️ Некоторые из сервисов Epic Games работают с ухудшенной производительностью."
         elif f_status['status']['description'] == "Partial System Outage":
-            f_status_message = "⚠️ Некоторые из сервисов Epic Games не работают или работают с ошибками."
+            f_status_message = "⚠️ Некоторые из сервисов Epic Games частично недоступны."
         elif f_status['status']['description'] == "Major Service Outage":
-            f_status_message = "❌ Большинство из сервисов Epic Games не работают или работают с ошибками."
+            f_status_message = "❌ Большинство из сервисов Epic Games недоступны."
         else:
             f_status_message = "⁉️ С сервисами Epic Games происходит нечто странное (нештатная ситуация)."
         if f_status['components']:
@@ -42,8 +42,7 @@ async def status():
                             translations.translate_service_status(service['status']))
                         num += 1
         if f_status['incidents']:
-            f_status_message = "{0}\n\n❗️ Происшествия, из-за которых некоторые сервисы **не** работают в " \
-                               "штатном режиме:".format(f_status_message)
+            f_status_message = "{0}\n\n❗️ Происшествия, связанные с сервисами:".format(f_status_message)
             for num, incident in enumerate(f_status['incidents']):
                 f_status_message = "{0}\n{1}. {2}, [подробнее]({3}).".format(
                     f_status_message, num+1, incident['name'], incident['shortlink'])
@@ -51,7 +50,7 @@ async def status():
             f_status_message = "{0}\n\n🕰 Запланированные технические работы:".format(f_status_message)
             for num, maintenance in enumerate(f_status['scheduled_maintenances']):
                 f_status_message = "{0}\n{1}. {2}, запланировано начало на **{3}** в **{4}**, " \
-                                   "окончание на **{5}** в **{6}** UTC (московское время больше на 3 часа).".\
+                                   "окончание на **{5}** в **{6}** МСК.".\
                     format(f_status_message, num+1, maintenance['name'])
         f_status_message = "{0}\n\nУзнать подробную информацию о работе сервисов Epic Games можно " \
                            "[здесь](https://status.epicgames.com/).".format(f_status_message)
