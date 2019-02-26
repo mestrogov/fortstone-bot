@@ -29,10 +29,14 @@ async def store():
                     except requests.exceptions.MissingSchema:
                         item_file.write(requests.get(item['item']['images']['transparent']).content)
 
-                    # Создаем новое пустое изображение, которое потом будем сохранять
+                    # Переменные для названия предмета и его цены, которые будут использоваться дальше
+                    item_name = item['name'].upper()
+                    item_cost = item['cost']
+
                     image = Image.new("RGB", (512, 512), (255, 0, 0))
 
-                    # Делаем задний фон в зависимости от редкости; оригинал: https://stackoverflow.com/a/30669765
+                    # Делаем задний фон в зависимости от редкости
+                    # Оригинал: https://stackoverflow.com/a/30669765
                     center_color = colors.get_frame_center_color(item['item']['rarity'])
                     corner_color = colors.get_frame_corner_color(item['item']['rarity'])
                     for y in range(512):
@@ -49,18 +53,15 @@ async def store():
                     # Вставляем фотографию предмета по по центру на уже готовый задний фон
                     # Оригинал: https://stackoverflow.com/a/2563883
                     item_image = Image.open(item_file.name)
-                    item_image.thumbnail((512, 512), Image.ANTIALIAS)
-
                     item_image_width, item_image_height = item_image.size
                     background_image_width, background_image_height = image.size
                     offset = ((background_image_width - item_image_width) // 2,
                               (background_image_height - item_image_height) // 2)
 
+                    item_image.thumbnail((512, 512), Image.ANTIALIAS)
                     image.paste(item_image, offset, item_image)
 
-                    # Переменные, которые понадобятся дальше (название, цена предмета, шрифты)
-                    item_name = item['name'].upper()
-                    item_cost = item['cost']
+                    # Переменные шрифтов, которые будут использоваться дальше
                     font_name_size = int(72 - 0.75 * (len(item_name)))
                     font_name = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", font_name_size)
                     font_cost = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", 42)
@@ -75,13 +76,13 @@ async def store():
                               text=item_name, fill=(255, 255, 255), font=font_name)
 
                     # Делаем выделение текста будущей цены (закрашиваем место, где будет написана цена)
-                    draw.rectangle(((100, 200), (150, 200)), fill=(0, 0, 0))
+                    draw.rectangle(((0, 512), (512, 512 - 51)), fill=(7, 0, 35))
 
                     # Пишем цену предмета и вставляем иконку В-Баксов
-                    vbucks_image = Image.open("assets/icons/vbucks.png")
-                    vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
+                    # vbucks_image = Image.open("assets/icons/vbucks.png")
+                    # vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
 
-                    image.paste(vbucks_image, ((512 - item_cost_width) // 2, 512 - 46), vbucks_image)
+                    # image.paste(vbucks_image, ((512 - item_cost_width) // 2, 512 - 46), vbucks_image)
                     draw.text(xy=((512 - item_cost_width) // 2, 512 - 40),
                               text=item_cost, fil=(255, 255, 255), font=font_cost)
 
@@ -91,7 +92,7 @@ async def store():
                     # Сохраняем готовое изображение во временный файл
                     image.save(item_file.name, "PNG")
     except Exception as e:
-        logging.error("Произошла ошибка при выполнении команды /store.", exc_info=True)
+        logging.error("Произошла ошибка при попытке парсирования ежедневного магазина Fortnite.", exc_info=True)
         return "Произошла ошибка при попытке получения ежедневного магазина Fortnite."
 
 if __name__ == "__main__":

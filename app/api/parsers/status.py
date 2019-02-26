@@ -57,5 +57,5 @@ async def status():
 
         return f_status_message
     except Exception as e:
-        logging.error("Произошла ошибка при выполнении команды /status.", exc_info=True)
-        return "Произошла ошибка при попытке получения статуса сервисов Epic Games."
+        logging.error("Произошла ошибка при попытке парсирования статуса сервисов Epic Games.", exc_info=True)
+        return "Произошла ошибка при попытке парсирования статуса сервисов Epic Games."
