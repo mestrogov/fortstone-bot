@@ -53,12 +53,13 @@ async def store():
                     # Вставляем фотографию предмета по по центру на уже готовый задний фон
                     # Оригинал: https://stackoverflow.com/a/2563883
                     item_image = Image.open(item_file.name)
+
+                    item_image.thumbnail((512, 512), Image.ANTIALIAS)
                     item_image_width, item_image_height = item_image.size
                     background_image_width, background_image_height = image.size
                     offset = ((background_image_width - item_image_width) // 2,
                               (background_image_height - item_image_height) // 2)
 
-                    item_image.thumbnail((512, 512), Image.ANTIALIAS)
                     image.paste(item_image, offset, item_image)
 
                     # Переменные шрифтов, которые будут использоваться дальше

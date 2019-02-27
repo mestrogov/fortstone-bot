@@ -4,6 +4,8 @@ from app import logging
 from app.remote.redis import Redis
 from app.api.utils import translations
 import logging
+import pytz
+import datetime
 import json
 import requests
 
@@ -49,9 +51,17 @@ async def status():
         if f_status['scheduled_maintenances']:
             f_status_message = "{0}\n\n🕰 Запланированные технические работы:".format(f_status_message)
             for num, maintenance in enumerate(f_status['scheduled_maintenances']):
-                f_status_message = "{0}\n{1}. {2}, запланировано начало на **{3}** в **{4}**, " \
-                                   "окончание на **{5}** в **{6}** МСК.".\
-                    format(f_status_message, num+1, maintenance['name'])
+                scheduled_for_date = pytz.utc.localize(datetime.datetime.strptime(maintenance['scheduled_for'],
+                                                                                  "%Y-%m-%dT%H:%M:%S.%fZ")).\
+                    astimezone(pytz.timezone("Europe/Moscow"))
+                scheduled_until_date = pytz.utc.localize(datetime.datetime.strptime(maintenance['scheduled_until'],
+                                                                                    "%Y-%m-%dT%H:%M:%S.%fZ")).\
+                    astimezone(pytz.timezone("Europe/Moscow"))
+                f_status_message = "{0}\n{1}. [{2}]({3}), запланировано начало на **{4}** в **{5}**, " \
+                                   "окончание на **{6}** в **{7}** по МСК.".\
+                    format(f_status_message, num+1, maintenance['name'], maintenance['shortlink'],
+                           scheduled_for_date.strftime("%d.%m.%y"), scheduled_for_date.strftime("%H:%M"),
+                           scheduled_until_date.strftime("%d.%m.%y"), scheduled_until_date.strftime("%H:%M"))
         f_status_message = "{0}\n\nУзнать подробную информацию о работе сервисов Epic Games можно " \
                            "[здесь](https://status.epicgames.com/).".format(f_status_message)
 
