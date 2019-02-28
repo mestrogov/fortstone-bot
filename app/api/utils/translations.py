@@ -24,8 +24,9 @@ def translate_service_name(service):
 def translate_service_status(status):
     translated_statuses = {
         "operational": "работает в штатном режиме",
+        "under_maintenance": "на технических работах",
         "degraded_performance": "ухудшенная производительность",
-        "partial_outage": "частично недоступно"
+        "partial_outage": "частичная недоступность"
     }
 
     try:

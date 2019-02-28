@@ -23,6 +23,8 @@ async def status():
 
         if f_status['status']['description'] == "All Systems Operational":
             f_status_message = "✅ Сервисы Epic Games работают в штатном режиме."
+        elif f_status['status']['description'] == "Service Under Maintenance":
+            f_status_message = "🚨 Некоторые из сервисов Epic Games находятся на технических работах."
         elif f_status['status']['description'] == "Partially Degraded Service":
             f_status_message = "〽️ Некоторые из сервисов Epic Games работают с ухудшенной производительностью."
         elif f_status['status']['description'] == "Partial System Outage":
