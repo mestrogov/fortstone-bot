@@ -77,14 +77,14 @@ async def store():
                               text=item_name, fill=(255, 255, 255), font=font_name)
 
                     # Делаем выделение текста будущей цены (закрашиваем место, где будет написана цена)
-                    draw.rectangle(((0, 512), (512, 512 - 51)), fill=(7, 0, 35))
+                    draw.rectangle(((0, 512), (512, 512 - 50)), fill=(7, 0, 35))
 
                     # Пишем цену предмета и вставляем иконку В-Баксов
-                    # vbucks_image = Image.open("assets/icons/vbucks.png")
-                    # vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
+                    vbucks_image = Image.open("assets/icons/vbucks.png")
+                    vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
 
-                    # image.paste(vbucks_image, ((512 - item_cost_width) // 2, 512 - 46), vbucks_image)
-                    draw.text(xy=((512 - item_cost_width) // 2, 512 - 40),
+                    image.paste(vbucks_image, ((512 - item_cost_width - 40) // 2, 512 - 46), vbucks_image)
+                    draw.text(xy=((512 - item_cost_width + 48) // 2, 512 - 42),
                               text=item_cost, fil=(255, 255, 255), font=font_cost)
 
                     # Делаем рамку в зависимости от редкости
