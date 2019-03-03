@@ -31,9 +31,9 @@ async def store():
 
                     # Переменные для названия предмета и его цены, которые будут использоваться дальше
                     item_name = item['name'].upper()
-                    item_cost = item['cost']
+                    item_cost = "{:,}".format(int(item['cost']))
 
-                    image = Image.new("RGB", (512, 512), (255, 0, 0))
+                    image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
                     # Делаем задний фон в зависимости от редкости
                     # Оригинал: https://stackoverflow.com/a/30669765
@@ -62,6 +62,12 @@ async def store():
 
                     image.paste(item_image, offset, item_image)
 
+                    # Делаем полупрозрачное выделение для названия предмета
+                    s_image = Image.new("RGBA", (512, 512), (255, 0, 0, 0))
+                    s_image_draw = ImageDraw.Draw(s_image)
+                    s_image_draw.rectangle(((0, 512 - 50), (512, 512 - 117)), fill=(0, 0, 0, 110))
+                    image = Image.alpha_composite(image, s_image)
+
                     # Переменные шрифтов, которые будут использоваться дальше
                     font_name_size = int(72 - 0.75 * (len(item_name)))
                     font_name = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", font_name_size)
@@ -76,14 +82,15 @@ async def store():
                     draw.text(xy=((512 - item_name_width) // 2, 512 - 110),
                               text=item_name, fill=(255, 255, 255), font=font_name)
 
-                    # Делаем выделение текста будущей цены (закрашиваем место, где будет написана цена)
+                    # Делаем выделение текста для цены
                     draw.rectangle(((0, 512), (512, 512 - 50)), fill=(7, 0, 35))
 
-                    # Пишем цену предмета и вставляем иконку В-Баксов
+                    # Вставляем иконку В-Баксов
                     vbucks_image = Image.open("assets/icons/vbucks.png")
                     vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
-
                     image.paste(vbucks_image, ((512 - item_cost_width - 40) // 2, 512 - 46), vbucks_image)
+
+                    # Пишем цену предмета
                     draw.text(xy=((512 - item_cost_width + 48) // 2, 512 - 42),
                               text=item_cost, fil=(255, 255, 255), font=font_cost)
 
