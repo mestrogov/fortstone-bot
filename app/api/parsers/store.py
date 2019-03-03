@@ -20,87 +20,83 @@ async def store():
         # Создаем временный файл для итоговой фотографии магазина, которая уже непосредственно будет загружена
         with NamedTemporaryFile(suffix=".jpg") as store_file:
             for item in store_json['items']:
-                with NamedTemporaryFile(suffix=".png", delete=False) as item_file:
-                    logging.info("Генерируется фотография для предмета {0}.".format(item['name']))
-                    logging.debug("Сохраняется фотография во временный файл: {0}".format(item_file.name))
+                item_file = NamedTemporaryFile(suffix=".png", delete=False)
 
-                    # Сначала пытаемся скачать фотографию предмета в полный рост (featured)
-                    try:
-                        item_file.write(requests.get(item['item']['images']['featured']['transparent']).content)
-                    except requests.exceptions.MissingSchema:
-                        item_file.write(requests.get(item['item']['images']['transparent']).content)
+                logging.info("Генерируется фотография для предмета {0}.".format(item['name']))
+                logging.debug("Сохраняется фотография во временный файл: {0}".format(item_file.name))
 
-                    # Переменные для названия предмета и его цены, которые будут использоваться дальше
-                    item_name = item['name'].upper()
-                    item_cost = "{:,}".format(int(item['cost']))
+                # Сначала пытаемся скачать фотографию предмета в полный рост (featured)
+                try:
+                    item_file.write(requests.get(item['item']['images']['featured']['transparent']).content)
+                except requests.exceptions.MissingSchema:
+                    item_file.write(requests.get(item['item']['images']['transparent']).content)
 
-                    image = Image.new("RGBA", (512, 512), (255, 0, 0))
+                image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
-                    # Делаем задний фон в зависимости от редкости
-                    # Оригинал: https://stackoverflow.com/a/30669765
-                    center_color = colors.get_frame_center_color(item['item']['rarity'])
-                    corner_color = colors.get_frame_corner_color(item['item']['rarity'])
-                    for y in range(512):
-                        for x in range(512):
-                            distance_to_center = math.sqrt((x - 512 / 2) ** 2 + (y - 512 / 2) ** 2)
-                            distance_to_center = float(distance_to_center) / (math.sqrt(2) * 512 / 2)
+                # Делаем задний фон в зависимости от редкости
+                # Оригинал: https://stackoverflow.com/a/30669765
+                center_color = colors.get_frame_center_color(item['item']['rarity'])
+                corner_color = colors.get_frame_corner_color(item['item']['rarity'])
+                for y in range(512):
+                    for x in range(512):
+                        distance_to_center = math.sqrt((x - 512 / 2) ** 2 + (y - 512 / 2) ** 2)
+                        distance_to_center = float(distance_to_center) / (math.sqrt(2) * 512 / 2)
 
-                            r = corner_color[0] * distance_to_center + center_color[0] * (1 - distance_to_center)
-                            g = corner_color[1] * distance_to_center + center_color[1] * (1 - distance_to_center)
-                            b = corner_color[2] * distance_to_center + center_color[2] * (1 - distance_to_center)
+                        r = corner_color[0] * distance_to_center + center_color[0] * (1 - distance_to_center)
+                        g = corner_color[1] * distance_to_center + center_color[1] * (1 - distance_to_center)
+                        b = corner_color[2] * distance_to_center + center_color[2] * (1 - distance_to_center)
 
-                            image.putpixel((x, y), (int(r), int(g), int(b)))
+                        image.putpixel((x, y), (int(r), int(g), int(b)))
 
-                    # Вставляем фотографию предмета по по центру на уже готовый задний фон
-                    # Оригинал: https://stackoverflow.com/a/2563883
-                    item_image = Image.open(item_file.name)
+                # Вставляем фотографию предмета по по центру на уже готовый задний фон
+                # Оригинал: https://stackoverflow.com/a/2563883
+                item_image = Image.open(item_file.name)
+                item_image.thumbnail((512, 512), Image.ANTIALIAS)
+                item_image_width, item_image_height = item_image.size
+                background_image_width, background_image_height = image.size
+                offset = ((background_image_width - item_image_width) // 2,
+                          (background_image_height - item_image_height) // 2)
+                image.paste(item_image, offset, item_image)
 
-                    item_image.thumbnail((512, 512), Image.ANTIALIAS)
-                    item_image_width, item_image_height = item_image.size
-                    background_image_width, background_image_height = image.size
-                    offset = ((background_image_width - item_image_width) // 2,
-                              (background_image_height - item_image_height) // 2)
+                # Делаем полупрозрачное выделение для названия предмета
+                s_image = Image.new("RGBA", (512, 512), (255, 0, 0, 0))
+                s_image_draw = ImageDraw.Draw(s_image)
+                s_image_draw.rectangle(((0, 512 - 50), (512, 512 - 117)), fill=(0, 0, 0, 110))
+                image = Image.alpha_composite(image, s_image)
 
-                    image.paste(item_image, offset, item_image)
+                # Необходимые переменные: название, цена предмета, шрифты
+                item_name = item['name'].upper()
+                item_cost = "{:,}".format(int(item['cost']))
+                # Формула для вычисления необходимого размера шрифта: чем длиннее название, тем меньше шрифт
+                font_name_size = int(72 - 0.75 * (len(item_name)))
+                font_name = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", font_name_size)
+                font_cost = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", 42)
 
-                    # Делаем полупрозрачное выделение для названия предмета
-                    s_image = Image.new("RGBA", (512, 512), (255, 0, 0, 0))
-                    s_image_draw = ImageDraw.Draw(s_image)
-                    s_image_draw.rectangle(((0, 512 - 50), (512, 512 - 117)), fill=(0, 0, 0, 110))
-                    image = Image.alpha_composite(image, s_image)
+                # Получаем ширину, высоту названия и цены предмета
+                draw = ImageDraw.Draw(image)
+                item_name_width, item_image_height = draw.textsize(item_name, font=font_name)
+                item_cost_width, item_cost_height = draw.textsize(item_cost, font=font_cost)
 
-                    # Переменные шрифтов, которые будут использоваться дальше
-                    # Формула для вычисления необходимого размера шрифта: чем длиннее название, тем меньше шрифт
-                    font_name_size = int(72 - 0.75 * (len(item_name)))
-                    font_name = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", font_name_size)
-                    font_cost = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", 42)
+                # Пишем название предмета на изображении
+                draw.text(xy=((512 - item_name_width) // 2, 512 - 110),
+                          text=item_name, fill=(255, 255, 255), font=font_name)
 
-                    # Получаем ширину, высоту названия и цены предмета
-                    draw = ImageDraw.Draw(image)
-                    item_name_width, item_image_height = draw.textsize(item_name, font=font_name)
-                    item_cost_width, item_cost_height = draw.textsize(item_cost, font=font_cost)
+                # Делаем выделение текста для цены
+                draw.rectangle(((0, 512), (512, 512 - 50)), fill=(7, 0, 35))
 
-                    # Пишем название предмета на изображении
-                    draw.text(xy=((512 - item_name_width) // 2, 512 - 110),
-                              text=item_name, fill=(255, 255, 255), font=font_name)
+                # Вставляем иконку В-Баксов
+                vbucks_image = Image.open("assets/icons/vbucks.png")
+                vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
+                image.paste(vbucks_image, ((512 - item_cost_width - 55) // 2, 512 - 46), vbucks_image)
 
-                    # Делаем выделение текста для цены
-                    draw.rectangle(((0, 512), (512, 512 - 50)), fill=(7, 0, 35))
+                # Пишем цену предмета
+                draw.text(xy=((512 - item_cost_width + 41) // 2, 512 - 42),
+                          text=item_cost, fil=(255, 255, 255), font=font_cost)
 
-                    # Вставляем иконку В-Баксов
-                    vbucks_image = Image.open("assets/icons/vbucks.png")
-                    vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
-                    image.paste(vbucks_image, ((512 - item_cost_width - 55) // 2, 512 - 46), vbucks_image)
+                # Делаем рамку в зависимости от редкости
+                image = ImageOps.expand(image, border=5, fill=colors.get_frame_border_color(item['item']['rarity']))
 
-                    # Пишем цену предмета
-                    draw.text(xy=((512 - item_cost_width + 41) // 2, 512 - 42),
-                              text=item_cost, fil=(255, 255, 255), font=font_cost)
-
-                    # Делаем рамку в зависимости от редкости
-                    image = ImageOps.expand(image, border=5, fill=colors.get_frame_border_color(item['item']['rarity']))
-
-                    # Сохраняем готовое изображение во временный файл
-                    image.save(item_file.name, "PNG")
+                image.save(item_file.name, "PNG")
     except Exception:
         logging.error("Произошла ошибка при попытке парсирования ежедневного магазина Fortnite.", exc_info=True)
         return "Произошла ошибка при попытке получения ежедневного магазина Fortnite."
