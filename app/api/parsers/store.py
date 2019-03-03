@@ -21,7 +21,8 @@ async def store():
         with NamedTemporaryFile(suffix=".jpg") as store_file:
             for item in store_json['items']:
                 with NamedTemporaryFile(suffix=".png", delete=False) as item_file:
-                    logging.debug("Сохраняется фотография предмета во временный файл: {0}".format(item_file.name))
+                    logging.info("Генерируется фотография для предмета {0}.".format(item['name']))
+                    logging.debug("Сохраняется фотография во временный файл: {0}".format(item_file.name))
 
                     # Сначала пытаемся скачать фотографию предмета в полный рост (featured)
                     try:
@@ -69,6 +70,7 @@ async def store():
                     image = Image.alpha_composite(image, s_image)
 
                     # Переменные шрифтов, которые будут использоваться дальше
+                    # Формула для вычисления необходимого размера шрифта: чем длиннее название, тем меньше шрифт
                     font_name_size = int(72 - 0.75 * (len(item_name)))
                     font_name = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", font_name_size)
                     font_cost = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", 42)
@@ -88,10 +90,10 @@ async def store():
                     # Вставляем иконку В-Баксов
                     vbucks_image = Image.open("assets/icons/vbucks.png")
                     vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
-                    image.paste(vbucks_image, ((512 - item_cost_width - 40) // 2, 512 - 46), vbucks_image)
+                    image.paste(vbucks_image, ((512 - item_cost_width - 55) // 2, 512 - 46), vbucks_image)
 
                     # Пишем цену предмета
-                    draw.text(xy=((512 - item_cost_width + 48) // 2, 512 - 42),
+                    draw.text(xy=((512 - item_cost_width + 41) // 2, 512 - 42),
                               text=item_cost, fil=(255, 255, 255), font=font_cost)
 
                     # Делаем рамку в зависимости от редкости
@@ -99,7 +101,7 @@ async def store():
 
                     # Сохраняем готовое изображение во временный файл
                     image.save(item_file.name, "PNG")
-    except Exception as e:
+    except Exception:
         logging.error("Произошла ошибка при попытке парсирования ежедневного магазина Fortnite.", exc_info=True)
         return "Произошла ошибка при попытке получения ежедневного магазина Fortnite."
 
