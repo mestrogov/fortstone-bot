@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
+from app import config
 from app.remote.redis import Redis
 from app.api.utils import translations
 import logging
@@ -15,11 +16,11 @@ async def status():
         api_status_url = "https://status.epicgames.com/api/v2/summary.json"
 
         f_status = (await Redis.execute("GET", "fortnite:status"))['details']
-        if not f_status:
+        if f_status and not config.DEVELOPER_MODE:
+            f_status = json.loads(f_status)
+        else:
             f_status = requests.get(api_status_url).json()
             await Redis.execute("SET", "fortnite:status", json.dumps(f_status), "EX", 15)
-        else:
-            f_status = json.loads(f_status)
 
         if f_status['status']['description'] == "All Systems Operational":
             f_status_message = "✅ Сервисы Epic Games работают в штатном режиме."
