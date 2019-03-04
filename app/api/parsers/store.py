@@ -29,10 +29,8 @@ async def store():
             store_json = requests.get(api_store_url).json()
             await Redis.execute("SET", "fortnite:store:json", json.dumps(store_json), "EX", 15)
 
-        """
-        JSON для тестирования с малым количеством элементов
-        store_json = {"date_layout": "day-month-year", "lastupdate": 1551571214, "language": "en", "date": "29-05-52", "rows": 13, "vbucks": "https://fortnite-public-files.theapinetwork.com/fortnite-vbucks-icon.png","items":[{"itemid":"76fe82f-693c99a-d3297b4-bdf9d31","name":"Reflex","cost":"1200","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","background":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31.png","information":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/76fe82f-693c99a-d3297b4-bdf9d31.png"}},"captial":"outfit","type":"outfit","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.98,"totalPoints":648,"numberVotes":163}},{"itemid":"43f67c0-cda8fda-0d630f1-ba345d8","name":"Flimsie Flail","cost":"800","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","background":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8.png","information":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8/item.png","featured":{"transparent":None}},"captial":"pickaxe","type":"pickaxe","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.97,"totalPoints":850,"numberVotes":214}},{"itemid":"8199036-3210242-6480297-c657fa5","name":"Maverick","cost":"1500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","background":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5.png","information":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/8199036-3210242-6480297-c657fa5.png"}},"captial":"outfit","type":"outfit","rarity":"epic","obtained_type":"vbucks"},"ratings":{"avgStars":4.02,"totalPoints":494,"numberVotes":123}},{"itemid":"0896bd2-34ccd96-2cd9ff0-30f47cf","name":"Hyper","cost":"500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","background":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf.png","information":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf/item.png","featured":{"transparent":None}},"captial":"glider","type":"glider","rarity":"uncommon","obtained_type":"vbucks"},"ratings":{"avgStars":3.05,"totalPoints":195,"numberVotes":64}}]}
-        """
+        # JSON для тестирования с малым количеством элементов
+        # store_json = {"date_layout": "day-month-year", "lastupdate": 1551571214, "language": "en", "date": "29-05-52", "rows": 13, "vbucks": "https://fortnite-public-files.theapinetwork.com/fortnite-vbucks-icon.png","items":[{"itemid":"76fe82f-693c99a-d3297b4-bdf9d31","name":"Reflex","cost":"1200","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","background":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31.png","information":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/76fe82f-693c99a-d3297b4-bdf9d31.png"}},"captial":"outfit","type":"outfit","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.98,"totalPoints":648,"numberVotes":163}},{"itemid":"43f67c0-cda8fda-0d630f1-ba345d8","name":"Flimsie Flail","cost":"800","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","background":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8.png","information":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8/item.png","featured":{"transparent":None}},"captial":"pickaxe","type":"pickaxe","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.97,"totalPoints":850,"numberVotes":214}},{"itemid":"8199036-3210242-6480297-c657fa5","name":"Maverick","cost":"1500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","background":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5.png","information":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/8199036-3210242-6480297-c657fa5.png"}},"captial":"outfit","type":"outfit","rarity":"epic","obtained_type":"vbucks"},"ratings":{"avgStars":4.02,"totalPoints":494,"numberVotes":123}},{"itemid":"0896bd2-34ccd96-2cd9ff0-30f47cf","name":"Hyper","cost":"500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","background":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf.png","information":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf/item.png","featured":{"transparent":None}},"captial":"glider","type":"glider","rarity":"uncommon","obtained_type":"vbucks"},"ratings":{"avgStars":3.05,"totalPoints":195,"numberVotes":64}}]}
 
         store_hash = sha1(str(store_json).encode("UTF-8")).hexdigest()
 
@@ -138,18 +136,16 @@ async def store():
             image = Image.new("RGBA", (2700, 10240), (35, 35, 35))
             draw = ImageDraw.Draw(image)
 
-            # Необходимые переменные: шрифты, названия
+            # Необходимые переменные: описание магазина (дата, копирайт), шрифты
             shop_date = pytz.utc.localize(datetime.datetime.strptime(store_json['date'], "%d-%m-%y")).astimezone(
                 pytz.timezone("Europe/Moscow"))
             shop_info_text = "Ежедневный магазин Fortnite от {0}".format(shop_date.strftime("%d.%m.%Y"))
             shop_copyright_text = "https://t.me/fortnitearchives"
-            shop_category_featured = "Рекомендуемые"
-            shop_category_daily = "Ежедневные"
             font_shop_info = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 72)
             font_shop_copyright = ImageFont.truetype("assets/fonts/RobotoCondensed-Regular.ttf", 64)
             font_shop_category_names = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 96)
 
-            # Пишем копирайт и дату магазина
+            # Пишем дату магазина и копирайт (любой текст)
             shop_info_width, shop_info_height = draw.textsize(shop_info_text, font=font_shop_info)
             shop_copyright_width, shop_copyright_height = draw.textsize(shop_copyright_text, font=font_shop_copyright)
             draw.text(xy=((2700 - shop_info_width) // 2, 30), text=shop_info_text,
@@ -157,19 +153,18 @@ async def store():
             draw.text(xy=((2700 - shop_copyright_width) // 2, 120), text=shop_copyright_text,
                       fill=(173, 173, 173), font=font_shop_copyright)
 
-            # Пишем название категорий
-            shop_category_featured_width, shop_category_featured_height = draw.textsize(shop_category_featured,
+            # Пишем название категорий (рекомендуемое, ежедневное)
+            shop_category_featured_width, shop_category_featured_height = draw.textsize("Рекомендуемые",
                                                                                         font_shop_category_names)
-            shop_category_daily_width, shop_category_daily_height = draw.textsize(shop_category_daily,
+            shop_category_daily_width, shop_category_daily_height = draw.textsize("Ежедневные",
                                                                                   font_shop_category_names)
-            draw.text(xy=((1280 - shop_category_featured_width) // 2, 300), text=shop_category_featured,
+            draw.text(xy=((1350 - shop_category_featured_width) // 2, 300), text="Рекомендуемые",
                       fill=(255, 255, 255), font=font_shop_category_names)
-            draw.text(xy=((2700 + shop_category_daily_width) // 2, 300), text=shop_category_daily,
+            draw.text(xy=((2700 - shop_category_daily_width) // 2, 300), text="Ежедневные",
                       fill=(255, 255, 255), font=font_shop_category_names)
 
             # Вставляем изображения рекомендуемых предметов
             last_featured_item_location = [78, 468]
-
             for num, featured_item_file in enumerate(featured_items_files, 1):
                 featured_item = Image.open(featured_item_file)
                 if num == 1:
@@ -183,7 +178,6 @@ async def store():
 
             # Вставляем изображения ежедневных предметов
             last_daily_item_location = [1500, 468]
-
             for num, daily_item_file in enumerate(daily_items_files, 1):
                 daily_item = Image.open(daily_item_file)
                 if num == 1:
@@ -194,6 +188,10 @@ async def store():
                 else:
                     last_daily_item_location = [last_daily_item_location[0] - 600, last_daily_item_location[1] + 600]
                     image.paste(daily_item, tuple(last_daily_item_location))
+
+            # Обрезаем изображение до необходимых размеров
+            shop_category_widths = [last_featured_item_location[1], last_daily_item_location[1]]
+            image = image.crop((0, 0, 2700, max(shop_category_widths) + 600))
 
             image.save(store_file.name, "PNG")
             store_file = store_file.name
