@@ -59,7 +59,6 @@ async def store():
                     except:
                         item_file.write(requests.get(item['item']['images']['transparent']).content)
 
-                    # Создаем новое изображение для предмета
                     image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
                     # Делаем задний фон в зависимости от редкости
@@ -137,7 +136,6 @@ async def store():
 
             logging.debug("Изображение магазина предметов сохраняется во временный файл: {0}.".format(store_file.name))
 
-            # Создаем новое изображение для всего магазина предметов
             image = Image.new("RGBA", (2700, 10240), (35, 35, 35))
             draw = ImageDraw.Draw(image)
 

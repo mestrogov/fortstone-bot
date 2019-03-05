@@ -22,18 +22,10 @@ async def status():
             f_status = requests.get(api_status_url).json()
             await Redis.execute("SET", "fortnite:status", json.dumps(f_status), "EX", 20)
 
-        if f_status['status']['description'] == "All Systems Operational":
-            f_status_message = "✅ Сервисы Epic Games работают в штатном режиме."
-        elif f_status['status']['description'] == "Service Under Maintenance":
-            f_status_message = "🚨 Некоторые из сервисов Epic Games находятся на технических работах."
-        elif f_status['status']['description'] == "Partially Degraded Service":
-            f_status_message = "〽️ Некоторые из сервисов Epic Games работают с ухудшенной производительностью."
-        elif f_status['status']['description'] == "Partial System Outage":
-            f_status_message = "⚠️ Некоторые из сервисов Epic Games частично недоступны."
-        elif f_status['status']['description'] == "Major Service Outage":
-            f_status_message = "❌ Большинство из сервисов Epic Games недоступны."
-        else:
-            f_status_message = "⁉️ С сервисами Epic Games происходит нечто странное (нештатная ситуация)."
+        # Переводим глобальное состояние сервисов на русский
+        f_status_message = translations.translate_global_status(f_status['status']['description'])
+
+        # Проверяем, есть ли информация о сервисах, которые не работают в штатном режиме
         if f_status['components']:
             broken_services = [service for service in f_status['components'] if not service['status'] == "operational"]
             if broken_services:
@@ -46,11 +38,15 @@ async def status():
                             f_status_message, num, translations.translate_service_name(service['name']),
                             translations.translate_service_status(service['status']))
                         num += 1
+
+        # Проверяем, есть ли информация о происшествиях
         if f_status['incidents']:
             f_status_message = "{0}\n\n❗️ Происшествия, связанные с сервисами:".format(f_status_message)
             for num, incident in enumerate(f_status['incidents']):
                 f_status_message = "{0}\n{1}. {2}, [подробнее]({3}).".format(
                     f_status_message, num+1, incident['name'], incident['shortlink'])
+
+        # Проверяем, есть ли информация о запланированных технических работах
         if f_status['scheduled_maintenances']:
             f_status_message = "{0}\n\n🕰 Запланированные технические работы:".format(f_status_message)
             for num, maintenance in enumerate(f_status['scheduled_maintenances']):
@@ -65,7 +61,8 @@ async def status():
                     format(f_status_message, num+1, maintenance['name'], maintenance['shortlink'],
                            scheduled_for_date.strftime("%d.%m.%y"), scheduled_for_date.strftime("%H:%M"),
                            scheduled_until_date.strftime("%d.%m.%y"), scheduled_until_date.strftime("%H:%M"))
-        f_status_message = "{0}\n\nУзнать подробную информацию о работе сервисов Epic Games можно " \
+
+        f_status_message = "{0}\n\nУзнать более подробную информацию о работе сервисов Epic Games можно " \
                            "[здесь](https://status.epicgames.com/).".format(f_status_message)
 
         return f_status_message
