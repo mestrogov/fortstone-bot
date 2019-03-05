@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
+from app import config
 from app.remote.redis import Redis as redis
 from app.telegram.app import get_client as telegram_get_client
 from app.channel.item_store import post as channel_store_poster
@@ -20,7 +21,11 @@ if __name__ == "__main__":
         # Telegram клиенту нужно немного времени, чтобы запуститься
         sleep(1)
 
-        # Публикация магазина предметов прямо в канал
-        Thread(target=channel_store_poster, args=(client,), name="channel_store_poster").start()
+        # Если в конфиге указан ID канала, то запускаем поток с публикованием ежедневного магазина
+        if config.CHANNEL_ID:
+            Thread(target=channel_store_poster, args=(client,), name="channel_store_poster").start()
+        else:
+            logging.info("ID канала не указан в конфигурационном файле, постинг магазина предметов в канал "
+                         "не будет работать.")
     except Exception as e:
         logging.critical("Произошла ошибка в работе приложения.", exc_info=True)
