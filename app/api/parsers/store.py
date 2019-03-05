@@ -23,11 +23,10 @@ async def store():
 
         store_json = (await Redis.execute("GET", "fortnite:store:json"))['details']
         if store_json and not config.DEVELOPER_MODE:
-            logging.info("Данные магазина предметов были кэшированы ранеее (время инвалидации -- 15 секунд).")
             store_json = json.loads(store_json)
         else:
             store_json = requests.get(api_store_url).json()
-            await Redis.execute("SET", "fortnite:store:json", json.dumps(store_json), "EX", 15)
+            await Redis.execute("SET", "fortnite:store:json", json.dumps(store_json), "EX", 20)
 
         # JSON для тестирования с малым количеством элементов
         # store_json = {"date_layout": "day-month-year", "lastupdate": 1551571214, "language": "en", "date": "29-05-52", "rows": 13, "vbucks": "https://fortnite-public-files.theapinetwork.com/fortnite-vbucks-icon.png","items":[{"itemid":"76fe82f-693c99a-d3297b4-bdf9d31","name":"Reflex","cost":"1200","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","background":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31.png","information":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/76fe82f-693c99a-d3297b4-bdf9d31.png"}},"captial":"outfit","type":"outfit","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.98,"totalPoints":648,"numberVotes":163}},{"itemid":"43f67c0-cda8fda-0d630f1-ba345d8","name":"Flimsie Flail","cost":"800","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","background":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8.png","information":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8/item.png","featured":{"transparent":None}},"captial":"pickaxe","type":"pickaxe","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.97,"totalPoints":850,"numberVotes":214}},{"itemid":"8199036-3210242-6480297-c657fa5","name":"Maverick","cost":"1500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","background":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5.png","information":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/8199036-3210242-6480297-c657fa5.png"}},"captial":"outfit","type":"outfit","rarity":"epic","obtained_type":"vbucks"},"ratings":{"avgStars":4.02,"totalPoints":494,"numberVotes":123}},{"itemid":"0896bd2-34ccd96-2cd9ff0-30f47cf","name":"Hyper","cost":"500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","background":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf.png","information":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf/item.png","featured":{"transparent":None}},"captial":"glider","type":"glider","rarity":"uncommon","obtained_type":"vbucks"},"ratings":{"avgStars":3.05,"totalPoints":195,"numberVotes":64}}]}
@@ -41,6 +40,8 @@ async def store():
             store_file = NamedTemporaryFile(suffix=".png", delete=False)
             featured_items_files = []
             daily_items_files = []
+
+            logging.info("Генерируется изображение магазина от {0}.".format(store_json['date']))
 
             for item in store_json['items']:
                 try:
@@ -58,6 +59,7 @@ async def store():
                     except:
                         item_file.write(requests.get(item['item']['images']['transparent']).content)
 
+                    # Создаем новое изображение для предмета
                     image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
                     # Делаем задний фон в зависимости от редкости
@@ -133,13 +135,13 @@ async def store():
                                   exc_info=True)
                     continue
 
-            logging.info("Генерируется изображение магазина от {0}.".format(store_json['date']))
-            logging.debug("Изображение магазина сохраняется во временный файл: {0}.".format(store_file.name))
+            logging.debug("Изображение магазина предметов сохраняется во временный файл: {0}.".format(store_file.name))
 
+            # Создаем новое изображение для всего магазина предметов
             image = Image.new("RGBA", (2700, 10240), (35, 35, 35))
             draw = ImageDraw.Draw(image)
 
-            # Необходимые переменные: описание магазина (дата, копирайт), шрифты
+            # Необходимые переменные: описание магазина предметов (дата, подробности), шрифты
             shop_date = pytz.utc.localize(datetime.datetime.strptime(store_json['date'], "%d-%m-%y")).astimezone(
                 pytz.timezone("Europe/Moscow"))
             shop_text = "Ежедневный магазин предметов в Фортнайте"
@@ -148,7 +150,7 @@ async def store():
             font_shop_ext = ImageFont.truetype("assets/fonts/RobotoCondensed-Regular.ttf", 64)
             font_shop_category_names = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 96)
 
-            # Пишем дату магазина и дополнительный текст (дата, любая другая информация)
+            # Пишем дату магазина предметов и дополнительный текст (подробности)
             shop_text_width, shop_text_height = draw.textsize(shop_text, font=font_shop_text)
             shop_ext_width, shop_ext_height = draw.textsize(shop_ext, font=font_shop_ext)
             draw.text(xy=((2700 - shop_text_width) // 2, 30), text=shop_text,

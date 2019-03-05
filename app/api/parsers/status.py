@@ -20,7 +20,7 @@ async def status():
             f_status = json.loads(f_status)
         else:
             f_status = requests.get(api_status_url).json()
-            await Redis.execute("SET", "fortnite:status", json.dumps(f_status), "EX", 15)
+            await Redis.execute("SET", "fortnite:status", json.dumps(f_status), "EX", 20)
 
         if f_status['status']['description'] == "All Systems Operational":
             f_status_message = "✅ Сервисы Epic Games работают в штатном режиме."
