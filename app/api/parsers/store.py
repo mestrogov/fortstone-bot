@@ -49,10 +49,13 @@ async def store():
                     logging.info("Генерируется фотография для предмета {0}.".format(item['name']))
                     logging.debug("Фотография предмета сохраняется во временный файл: {0}".format(item_file.name))
 
-                    # Сначала пытаемся скачать фотографию предмета в полный рост (featured)
+                    # Если предмет находится в категории "Рекомендуемое", то скачиваем фотографию в полный рост
                     try:
-                        item_file.write(requests.get(item['item']['images']['featured']['transparent']).content)
-                    except requests.exceptions.MissingSchema:
+                        if item['featured']:
+                            item_file.write(requests.get(item['item']['images']['featured']['transparent']).content)
+                        else:
+                            raise Exception
+                    except:
                         item_file.write(requests.get(item['item']['images']['transparent']).content)
 
                     image = Image.new("RGBA", (512, 512), (255, 0, 0))
