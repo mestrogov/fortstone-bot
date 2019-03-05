@@ -139,28 +139,28 @@ async def store():
             # Необходимые переменные: описание магазина (дата, копирайт), шрифты
             shop_date = pytz.utc.localize(datetime.datetime.strptime(store_json['date'], "%d-%m-%y")).astimezone(
                 pytz.timezone("Europe/Moscow"))
-            shop_info_text = "Ежедневный магазин Fortnite от {0}".format(shop_date.strftime("%d.%m.%Y"))
-            shop_copyright_text = "https://t.me/fortnitearchives"
-            font_shop_info = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 72)
-            font_shop_copyright = ImageFont.truetype("assets/fonts/RobotoCondensed-Regular.ttf", 64)
+            shop_text = "Ежедневный магазин предметов в Фортнайте"
+            shop_ext = "{0} | https://t.me/fortnitearchives".format(shop_date.strftime("%d.%m.%Y"))
+            font_shop_text = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 72)
+            font_shop_ext = ImageFont.truetype("assets/fonts/RobotoCondensed-Regular.ttf", 64)
             font_shop_category_names = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 96)
 
-            # Пишем дату магазина и копирайт (любой текст)
-            shop_info_width, shop_info_height = draw.textsize(shop_info_text, font=font_shop_info)
-            shop_copyright_width, shop_copyright_height = draw.textsize(shop_copyright_text, font=font_shop_copyright)
-            draw.text(xy=((2700 - shop_info_width) // 2, 30), text=shop_info_text,
-                      fill=(255, 255, 255), font=font_shop_info)
-            draw.text(xy=((2700 - shop_copyright_width) // 2, 120), text=shop_copyright_text,
-                      fill=(173, 173, 173), font=font_shop_copyright)
+            # Пишем дату магазина и дополнительный текст (дата, любая другая информация)
+            shop_text_width, shop_text_height = draw.textsize(shop_text, font=font_shop_text)
+            shop_ext_width, shop_ext_height = draw.textsize(shop_ext, font=font_shop_ext)
+            draw.text(xy=((2700 - shop_text_width) // 2, 30), text=shop_text,
+                      fill=(255, 255, 255), font=font_shop_text)
+            draw.text(xy=((2700 - shop_ext_width) // 2, 120), text=shop_ext,
+                      fill=(173, 173, 173), font=font_shop_ext)
 
             # Пишем название категорий (рекомендуемое, ежедневное)
             shop_category_featured_width, shop_category_featured_height = draw.textsize("Рекомендуемые",
                                                                                         font_shop_category_names)
             shop_category_daily_width, shop_category_daily_height = draw.textsize("Ежедневные",
                                                                                   font_shop_category_names)
-            draw.text(xy=((1350 - shop_category_featured_width) // 2, 300), text="Рекомендуемые",
+            draw.text(xy=(78 + (1122 - shop_category_featured_width) // 2, 300), text="Рекомендуемые",
                       fill=(255, 255, 255), font=font_shop_category_names)
-            draw.text(xy=((2700 - shop_category_daily_width) // 2, 300), text="Ежедневные",
+            draw.text(xy=(1500 + (1122 - shop_category_daily_width) // 2, 300), text="Ежедневные",
                       fill=(255, 255, 255), font=font_shop_category_names)
 
             # Вставляем изображения рекомендуемых предметов
@@ -197,7 +197,7 @@ async def store():
             store_file = store_file.name
             await Redis.execute("SET", "fortnite:store:file:{0}".format(store_hash), store_file, "EX", 86400)
 
-        return store_file
+        return store_file, store_hash
     except Exception:
         logging.error("Произошла ошибка при генерации изображения ежедневного магазина Fortnite.", exc_info=True)
         return "Произошла ошибка при генерации изображения ежедневного магазина Fortnite."
