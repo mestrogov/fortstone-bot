@@ -7,7 +7,10 @@ services:
     environment:
       - VERSION=${VERSION}
       - DEVELOPER_MODE=${DEVELOPER_MODE}
+      - API_ID=${API_ID}
+      - API_HASH=${API_HASH}
       - BOT_TOKEN=${BOT_TOKEN}
+      - CHANNEL_ID=${CHANNEL_ID}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
     depends_on:

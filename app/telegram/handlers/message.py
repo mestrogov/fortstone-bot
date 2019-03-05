@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
 
-def message():
+def message(client, message):
     pass

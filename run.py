@@ -3,6 +3,7 @@
 from app import logging
 from app.remote.redis import Redis as redis
 from app.telegram.app import get_client as telegram_get_client
+from app.channel.item_store import post as channel_store_poster
 from threading import Thread
 from time import sleep
 import logging
@@ -18,5 +19,8 @@ if __name__ == "__main__":
 
         # Telegram клиенту нужно немного времени, чтобы запуститься
         sleep(1)
+
+        # Публикация магазина предметов прямо в канал
+        Thread(target=channel_store_poster, args=(client,), name="channel_store_poster").start()
     except Exception as e:
         logging.critical("Произошла ошибка в работе приложения.", exc_info=True)

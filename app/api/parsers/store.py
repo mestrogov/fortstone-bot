@@ -23,7 +23,7 @@ async def store():
 
         store_json = (await Redis.execute("GET", "fortnite:store:json"))['details']
         if store_json and not config.DEVELOPER_MODE:
-            logging.info("Данные ежедневного магазина были кэшированы ранеее (время инвалидации -- 15 секунд).")
+            logging.info("Данные магазина предметов были кэшированы ранеее (время инвалидации -- 15 секунд).")
             store_json = json.loads(store_json)
         else:
             store_json = requests.get(api_store_url).json()
@@ -36,7 +36,7 @@ async def store():
 
         store_file = (await Redis.execute("GET", "fortnite:store:file:{0}".format(store_hash)))['details']
         if store_file and isfile(store_file) and not config.DEVELOPER_MODE:
-            logging.info("Изображение ежедневного магазина уже было сгенерировано, файл: {0}.".format(store_file))
+            logging.info("Изображение магазина предметов уже было сгенерировано, файл: {0}.".format(store_file))
         else:
             store_file = NamedTemporaryFile(suffix=".png", delete=False)
             featured_items_files = []
@@ -202,8 +202,8 @@ async def store():
 
         return store_file, store_hash
     except Exception:
-        logging.error("Произошла ошибка при генерации изображения ежедневного магазина Fortnite.", exc_info=True)
-        return "Произошла ошибка при генерации изображения ежедневного магазина Fortnite."
+        logging.error("Произошла ошибка при генерации изображения магазина предметов в Фортнайте.", exc_info=True)
+        return "Произошла ошибка при генерации изображения магазина предметов в Фортнайте."
 
 if __name__ == "__main__":
     try:

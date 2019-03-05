@@ -17,16 +17,16 @@ def store(client, message):
         item_store_file_id = asyncio.get_event_loop().run_until_complete(Redis.execute(
             "GET", "fortnite:store:file_id:{0}".format(item_store_hash)))['details']
         if item_store_file_id and not config.DEVELOPER_MODE:
-            logging.info("Изображение ежедневного магазина уже было загружено в Telegram, "
+            logging.info("Изображение магазина предметов уже было загружено в Telegram, "
                          "File ID: {0}.".format(item_store_file_id))
             client.send_photo(message.from_user.id, item_store_file_id,
-                              caption="🛒 Вот, что находится в ежедневном магазине предметов сегодня.")
+                              caption="🛒 Вот, что находится в магазине предметов сегодня.")
         else:
             store_photo = client.send_photo(message.from_user.id, item_store_file,
-                                            caption="🛒 Вот, что находится в ежедневном магазине предметов сегодня.")
+                                            caption="🛒 Вот, что находится в магазине предметов сегодня.")
             item_store_file_id = store_photo['photo']['sizes'][-1]['file_id']
             asyncio.get_event_loop().run_until_complete(Redis.execute(
-                "SET", "fortnite:store:file_id:{0}".format(item_store_hash), item_store_file_id, "EX", "86400"))
+                "SET", "fortnite:store:file_id:{0}".format(item_store_hash), item_store_file_id, "EX", 86400))
     except Exception as e:
         logging.error("Произошла ошибка при выполнении команды /store.", exc_info=True)
         return e
