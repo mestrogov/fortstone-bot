@@ -19,10 +19,10 @@ def store(client, message):
         if item_store_file_id and not config.DEVELOPER_MODE:
             logging.info("Изображение магазина предметов уже было загружено в Telegram, "
                          "File ID: {0}.".format(item_store_file_id))
-            client.send_photo(message.from_user.id, item_store_file_id,
+            client.send_photo(message.chat.id, item_store_file_id,
                               caption="🛒 Вот, что находится в магазине предметов сегодня.")
         else:
-            store_photo = client.send_photo(message.from_user.id, item_store_file,
+            store_photo = client.send_photo(message.chat.id, item_store_file,
                                             caption="🛒 Вот, что находится в магазине предметов сегодня.")
             item_store_file_id = store_photo['photo']['sizes'][-1]['file_id']
             asyncio.get_event_loop().run_until_complete(Redis.execute(
