@@ -3,7 +3,7 @@
 from app import logging
 from app import config
 from app.remote.redis import Redis
-from app.fortnite.parsers.utils import store_colors
+from app.fortnite.parser.utils import store_colors
 from tempfile import NamedTemporaryFile
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from hashlib import sha1

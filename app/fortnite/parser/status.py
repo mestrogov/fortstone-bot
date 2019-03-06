@@ -4,7 +4,7 @@ from app import logging
 from app import config
 from app import utils
 from app.remote.redis import Redis
-from app.fortnite.parsers.utils import status_translations
+from app.fortnite.parser.utils import status_translations
 import logging
 import json
 import requests

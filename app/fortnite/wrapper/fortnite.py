@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # Оригинал: https://github.com/nicolaskenner/python-fortnite-api-wrapper
 
+from app import logging
 from app import utils
 from app.fortnite.wrapper.session import Session
 from app.fortnite.wrapper import constants
 import requests
+import logging
 
 
 class Fortnite:
@@ -28,14 +30,18 @@ class Fortnite:
         expires_at = utils.convert_iso_time(token_response.get('expires_at'))
         self.session = Session(access_token, refresh_token, expires_at, fortnite_token)
 
+        logging.info("Токен доступа для использования Fortnite API получен.")
+        logging.debug("Access Token: {0}; Refresh Token: {1}; Expires At: {2}.".format(
+            access_token, refresh_token, expires_at))
+
     def account_lookup(self, username):
         """Return object containing player name and id"""
         response = self.session.get(constants.ACCOUNT_LOOKUP.format(username))
         return response
 
-    def player_stats(self, username, platform):
+    def player_stats(self, username):
         """Return object containing Battle Royale stats"""
-        player_id = self.account_lookup(username).id
+        player_id = self.account_lookup(username)['id']
         response = self.session.get(constants.PLAYER_STATS.format(player_id))
         return response
 

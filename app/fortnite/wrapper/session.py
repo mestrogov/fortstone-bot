@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # Оригинал: https://github.com/nicolaskenner/python-fortnite-api-wrapper
 
+from app import logging
 from app import utils
 from app.fortnite.wrapper import constants
 from threading import Timer
 from datetime import datetime, timedelta
 import requests
+import logging
 
 
 class Session:
@@ -21,7 +23,8 @@ class Session:
             Timer(20.0, check_token).start()
             now = datetime.utcnow()
             if self.expires_at < (now - timedelta(seconds=60)):
-                print('Token Refresh')
+                logging.info("Время действия токена доступа для Fortnite API истекло, генерируется новый.")
+
                 self.refresh()
 
         check_token()
@@ -35,6 +38,10 @@ class Session:
         self.session.headers.update({'Authorization': 'bearer {}'.format(access_token)})
         self.refresh_token = response.get('refresh_token')
         self.expires_at = utils.convert_iso_time(response.get('expires_at'))
+
+        logging.info("Токен доступа для использования Fortnite API перегенерирован.")
+        logging.debug("Access Token: {0}; Refresh Token: {1}; Expires At: {2}.".format(
+            access_token, self.refresh_token, self.expires_at))
 
     def get(self, endpoint, params=None, headers=None):
         response = self.session.get(endpoint, params=params, headers=headers)
