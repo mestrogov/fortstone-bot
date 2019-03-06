@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
-from app import config as config
+from app import config
 import logging
 
 

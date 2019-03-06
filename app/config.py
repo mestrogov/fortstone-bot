@@ -3,7 +3,7 @@
 from subprocess import run, PIPE
 from os import getenv
 from sys import exit
-from app.utils.parse_as_boolean import parse_as_boolean as parse_as_boolean
+from app.utils import parse_as_boolean
 import logging
 
 

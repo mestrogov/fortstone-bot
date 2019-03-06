@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from app import config as config
+from app import config
 from pyrogram import Client, MessageHandler, Filters
 from app.telegram.commands.debug import debug as debug_command
 from app.telegram.commands.start import start as start_command

@@ -3,7 +3,6 @@
 import logging
 from app import config
 
-
 try:
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
