@@ -3,7 +3,7 @@
 from app import logging
 from app import config
 from app.remote.redis import Redis
-from app.fortnite.api.utils import colors
+from app.fortnite.parsers.utils import store_colors
 from tempfile import NamedTemporaryFile
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from hashlib import sha1
@@ -63,8 +63,8 @@ async def store():
 
                     # Делаем задний фон в зависимости от редкости
                     # Оригинал: https://stackoverflow.com/a/30669765
-                    center_color = colors.get_frame_center_color(item['item']['rarity'])
-                    corner_color = colors.get_frame_corner_color(item['item']['rarity'])
+                    center_color = store_colors.get_frame_center_color(item['item']['rarity'])
+                    corner_color = store_colors.get_frame_corner_color(item['item']['rarity'])
                     for y in range(512):
                         for x in range(512):
                             distance_to_center = math.sqrt((x - 512 / 2) ** 2 + (y - 512 / 2) ** 2)
@@ -122,7 +122,7 @@ async def store():
                               text=item_cost, fil=(255, 255, 255), font=font_cost)
 
                     # Делаем рамку в зависимости от редкости
-                    image = ImageOps.expand(image, border=5, fill=colors.get_frame_border_color(item['item']['rarity']))
+                    image = ImageOps.expand(image, border=5, fill=store_colors.get_frame_border_color(item['item']['rarity']))
 
                     image.save(item_file.name, "PNG")
                     if item['featured']:

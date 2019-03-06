@@ -4,7 +4,7 @@ from app import logging
 from app import config
 from app import utils
 from app.remote.redis import Redis
-from app.fortnite.api.utils import translations
+from app.fortnite.parsers.utils import status_translations
 import logging
 import json
 import requests
@@ -22,7 +22,7 @@ async def status():
             await Redis.execute("SET", "fortnite:status", json.dumps(f_status), "EX", 20)
 
         # Переводим глобальное состояние сервисов на русский
-        message = translations.translate_global_status(f_status['status']['description'])
+        message = status_translations.translate_global_status(f_status['status']['description'])
 
         # Проверяем, есть ли информация о сервисах, которые не работают в штатном режиме
         if f_status['components']:
@@ -34,8 +34,8 @@ async def status():
                 for service in f_status['components']:
                     if not service['status'] == "operational" and not service['group']:
                         message = "{0}\n{1}. {2}, состояние: **{3}**.".format(
-                            message, num, translations.translate_service_name(service['name']),
-                            translations.translate_service_status(service['status'])
+                            message, num, status_translations.translate_service_name(service['name']),
+                            status_translations.translate_service_status(service['status'])
                         )
                         num += 1
 

@@ -3,7 +3,6 @@
 from app import config
 from app.remote.redis import Redis as redis
 from app.telegram.app import get_client as telegram_get_client
-from app.fortnite.app import get_client as fortnite_get_client
 from app.channel.item_store import post as channel_store_poster
 from threading import Thread, Timer
 from time import sleep
@@ -20,8 +19,6 @@ if __name__ == "__main__":
 
         # Telegram клиенту нужно немного времени, чтобы запуститься
         sleep(1)
-
-        # fortnite_client = fortnite_get_client()
 
         # Если в конфиге указан ID канала, то запускаем поток с публикованием ежедневного магазина
         if config.CHANNEL_ID:
