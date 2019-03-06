@@ -1,4 +1,3 @@
-# Packages
 aioredis>=1.2.0
 requests>=2.21.0
 pyrogram[fast]>=0.11.0

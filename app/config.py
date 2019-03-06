@@ -17,6 +17,11 @@ try:
     API_HASH = str(getenv("API_HASH"))
     BOT_TOKEN = str(getenv("BOT_TOKEN"))
     CHANNEL_ID = str(getenv("CHANNEL_ID"))
+    # Настройки аккаунта Epic Games для использования их API
+    EPIC_GAMES_EMAIL = str(getenv("EPIC_GAMES_EMAIL"))
+    EPIC_GAMES_PASSWORD = str(getenv("EPIC_GAMES_PASSWORD"))
+    LAUNCHER_TOKEN = str(getenv("LAUNCHER_TOKEN", "MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE="))
+    FORTNITE_TOKEN = str(getenv("FORTNITE_TOKEN", "ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ="))
 
     # Настройки Redis
     REDIS_HOST = str(getenv("REDIS_HOST", "127.0.0.1"))

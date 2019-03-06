@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
-from app.api.parsers.status import status as parse_services_status
+from app.fortnite.api.parsers.status import status as parse_services_status
 import logging
 import asyncio
 

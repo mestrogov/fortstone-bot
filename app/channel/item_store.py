@@ -3,7 +3,7 @@
 from app import logging
 from app import config
 from app.remote.redis import Redis
-from app.api.parsers.store import store as parse_item_store
+from app.fortnite.api.parsers.store import store as parse_item_store
 import logging
 import asyncio
 
