@@ -56,7 +56,7 @@ async def status():
                 scheduled_until_date = utils.convert_to_moscow(utils.convert_iso_time(maintenance['scheduled_until']))
 
                 message = "{0}\n{1}. [{2}]({3}), запланировано начало на **{4}** в **{5}**, " \
-                          "окончание на **{6}** в **{7}** по МСК.".\
+                          "окончание на **{6}** в **{7}** по московскому времени.".\
                     format(message, num+1, maintenance['name'], maintenance['shortlink'],
                            scheduled_for_date.strftime("%d.%m.%y"), scheduled_for_date.strftime("%H:%M"),
                            scheduled_until_date.strftime("%d.%m.%y"), scheduled_until_date.strftime("%H:%M"))

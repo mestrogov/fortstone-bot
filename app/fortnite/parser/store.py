@@ -35,7 +35,7 @@ async def store():
 
         store_file = (await Redis.execute("GET", "fortnite:store:file:{0}".format(store_hash)))['details']
         if store_file and isfile(store_file) and not config.DEVELOPER_MODE:
-            logging.info("Изображение магазина предметов уже было сгенерировано, файл: {0}.".format(store_file))
+            logging.info("Изображение текущего магазина предметов уже сгенерировано, файл: {0}.".format(store_file))
         else:
             store_file = NamedTemporaryFile(suffix=".png", delete=False)
             featured_items_files = []

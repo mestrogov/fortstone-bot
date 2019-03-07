@@ -52,9 +52,21 @@ class Fortnite:
 
     @staticmethod
     def ingame_news():
-        """Get the current news on fortnite."""
+        """Get the current news on fortnite from battle royale and save the world."""
         response = Session.get_noauth(endpoint=constants.INGAME_NEWS, headers={'Accept-Language': 'ru'})
-        return response
+        ingame_news = {
+            "battleroyale": {
+                "last_modified": response['battleroyalenews']['lastModified'],
+                "locale": response['battleroyalenews']['_locale'],
+                "news": response['battleroyalenews']['news']['messages']
+            },
+            "savetheworld": {
+                "last_modified": response['savetheworldnews']['lastModified'],
+                "locale": response['savetheworldnews']['_locale'],
+                "news": response['savetheworldnews']['news']['messages']
+            }
+        }
+        return ingame_news
 
     @staticmethod
     def server_status():
