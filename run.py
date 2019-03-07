@@ -5,7 +5,7 @@ from app.remote.redis import Redis as redis
 from app.telegram.app import get_client as telegram_get_client
 from app.fortnite.app import get_session as fortnite_get_session
 from app.channel.item_store import post as channel_store_poster
-from threading import Thread, Timer
+from threading import Thread
 from time import sleep
 import logging
 import asyncio
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
         # Если в конфиге указан ID канала, то запускаем поток с публикованием ежедневного магазина
         if config.CHANNEL_ID:
-            Timer(15, channel_store_poster, [telegram_client]).start()
+            Thread(target=channel_store_poster, args=(telegram_client,), name="channel_store_poster").start()
         else:
             logging.info("ID канала не указан в конфигурационном файле, постинг магазина предметов в канал "
                          "не будет работать.")
