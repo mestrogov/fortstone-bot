@@ -18,6 +18,29 @@ import requests
 import asyncio
 
 
+async def news_item_parse(news_item, font_title, font_body):
+    news_item_file = NamedTemporaryFile(suffix=".png", delete=False)
+    news_item_file.write(requests.get(news_item['image']).content)
+    logging.debug("Изображение элемента из текущих новостей сохраняется в файл: {0}.".format(news_item_file.name))
+
+    image = Image.new("RGBA", (2360, 522), (255, 0, 0))
+    draw = ImageDraw.Draw(image)
+
+    news_item_image = Image.open(news_item_file.name)
+    news_item_image.thumbnail((1024, 512), Image.ANTIALIAS)
+    news_item_image = ImageOps.expand(news_item_image, border=5, fill=(255, 255, 255))
+    image.paste(news_item_image, (0, 0))
+
+    draw.rectangle(((1034, 0), (2360, 522)),
+                   width=5, outline=(255, 255, 255), fill=(50, 50, 50))
+
+    draw.text(xy=(1056, 0), text=news_item['title'], fill=(255, 255, 255), font=font_title)
+    draw.multiline_text(xy=(1056, 40), text=news_item['body'], fill=(255, 255, 255), font=font_body, align="left")
+
+    image.save(news_item_file.name, "PNG")
+    return news_item_file.name
+
+
 async def news():
     try:
         news_json = (await Redis.execute("GET", "fortnite:news:json"))['details']
@@ -52,7 +75,7 @@ async def news():
             font_news_header = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 144)
             font_news_categories = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 72)
             font_news_ext = ImageFont.truetype("assets/fonts/RobotoCondensed-Regular.ttf", 48)
-            font_news_item_header = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 64)
+            font_news_item_title = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 64)
             font_news_item_body = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 48)
 
             draw.text(xy=(100, 150), text="Новости в Фортнайте".upper(), fill=(255, 255, 255), font=font_news_header)
@@ -66,23 +89,8 @@ async def news():
             last_news_item_position = [100, 700]
             for br_news_item in news_json['battleroyale']['news']:
                 try:
-                    news_item_file = NamedTemporaryFile(suffix=".png")
-                    news_item_file.write(requests.get(br_news_item['image']).content)
-
-                    news_item_image = Image.open(news_item_file.name)
-                    news_item_image.thumbnail((1024, 512), Image.ANTIALIAS)
-
-                    draw.rectangle(((1134, last_news_item_position[1]), (2460, last_news_item_position[1] + 521)),
-                                   width=5, outline=(255, 255, 255), fill=(50, 50, 50))
-                    news_item_image = ImageOps.expand(news_item_image, border=5, fill=(255, 255, 255))
-                    image.paste(news_item_image, tuple(last_news_item_position))
-
-                    draw.text(xy=(last_news_item_position[0] + 1060, last_news_item_position[1] + 10),
-                              text=br_news_item['title'], fill=(255, 255, 255), font=font_news_item_header)
-                    # draw.multiline_text(xy=(last_news_item_position[0] + 1050, last_news_item_position[1] + 40),
-                    #                     text=br_news_item['body'], fill=(255, 255, 255), font=font_news_categories,
-                    #                     align="left")
-
+                    br_news_item_file = await news_item_parse(br_news_item, font_news_item_title, font_news_item_body)
+                    image.paste(Image.open(br_news_item_file), tuple(last_news_item_position))
                     last_news_item_position = [last_news_item_position[0], last_news_item_position[1] + 600]
                 except:
                     logging.error("Произошла ошибка при парсировании новости.", exc_info=True)
@@ -97,7 +105,7 @@ async def news():
             last_news_item_position = [last_news_item_position[0], last_news_item_position[1] + 250]
 
             image = image.crop((0, 0, 2560, last_news_item_position[1] + 600))
-            image.save(news_file.name)
+            image.save(news_file.name, "PNG")
 
             news_file = news_file.name
             await Redis.execute("SET", "fortnite:news:file:{0}".format(news_hash), news_file, "EX", 86400)
