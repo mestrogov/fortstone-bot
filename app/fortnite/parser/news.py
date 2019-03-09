@@ -29,9 +29,9 @@ async def news_item_parse(news_item, font_title, font_body):
     news_item_image = ImageOps.expand(news_item_image, border=5, fill=(255, 255, 255))
     image.paste(news_item_image, (0, 0))
 
-    draw.rectangle(((1035, 0), (2360, 522)),
+    draw.rectangle(((1034, 0), (2360, 522)),
                    width=5, outline=(255, 255, 255), fill=(50, 50, 50))
-    draw.rectangle(((1040, 5), (2355, 105)), fill=(31, 41, 51))
+    draw.rectangle(((1040, 5), (2355, 105)), fill=(25, 25, 38))
 
     draw.text(xy=(1070, 15), text=news_item['title'], fill=(255, 255, 255), font=font_title)
     draw.multiline_text(xy=(1072, 120), text=wrap(news_item['body'], font_body, 1000),
