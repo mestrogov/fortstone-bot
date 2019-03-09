@@ -1,2 +1,4 @@
 # Подробнее здесь: https://docs.pyrogram.ml/start/Setup#user-authorization
 *.session
+# Ошибки, которые неизвестны Pyrogram'у, пишутся сюда
+unknown_errors.txt

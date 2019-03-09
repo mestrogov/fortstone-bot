@@ -78,7 +78,7 @@ async def store():
 
                     # Вставляем фотографию предмета по по центру на уже готовый задний фон
                     # Оригинал: https://stackoverflow.com/a/2563883
-                    item_image = Image.open(item_file.name)
+                    item_image = Image.open(item_file.name).convert("RGBA")
                     item_image.thumbnail((512, 512), Image.ANTIALIAS)
                     item_image_width, item_image_height = item_image.size
                     background_image_width, background_image_height = image.size
@@ -142,28 +142,28 @@ async def store():
             # Необходимые переменные: описание магазина предметов (дата, подробности), шрифты
             shop_date = pytz.utc.localize(datetime.datetime.strptime(store_json['date'], "%d-%m-%y")).astimezone(
                 pytz.timezone("Europe/Moscow"))
-            shop_text = "Ежедневный магазин предметов в Фортнайте"
+            shop_text = "Магазин предметов в Фортнайте".upper()
             shop_ext = "{0} | https://t.me/fortnitearchives".format(shop_date.strftime("%d.%m.%Y"))
-            font_shop_text = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 72)
-            font_shop_ext = ImageFont.truetype("assets/fonts/RobotoCondensed-Regular.ttf", 64)
-            font_shop_category_names = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 96)
+            font_shop_text = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 80)
+            font_shop_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 56)
+            font_shop_category_names = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
 
             # Пишем дату магазина предметов и дополнительный текст (подробности)
             shop_text_width, shop_text_height = draw.textsize(shop_text, font=font_shop_text)
             shop_ext_width, shop_ext_height = draw.textsize(shop_ext, font=font_shop_ext)
-            draw.text(xy=((2700 - shop_text_width) // 2, 30), text=shop_text,
+            draw.text(xy=((2700 - shop_text_width) // 2, 20), text=shop_text,
                       fill=(255, 255, 255), font=font_shop_text)
             draw.text(xy=((2700 - shop_ext_width) // 2, 120), text=shop_ext,
                       fill=(173, 173, 173), font=font_shop_ext)
 
             # Пишем название категорий (рекомендуемое, ежедневное)
-            shop_category_featured_width, shop_category_featured_height = draw.textsize("Рекомендуемые",
+            shop_category_featured_width, shop_category_featured_height = draw.textsize("Рекомендуемые".upper(),
                                                                                         font_shop_category_names)
-            shop_category_daily_width, shop_category_daily_height = draw.textsize("Ежедневные",
+            shop_category_daily_width, shop_category_daily_height = draw.textsize("Ежедневные".upper(),
                                                                                   font_shop_category_names)
-            draw.text(xy=(78 + (1122 - shop_category_featured_width) // 2, 300), text="Рекомендуемые",
+            draw.text(xy=(78 + (1122 - shop_category_featured_width) // 2, 320), text="Рекомендуемые".upper(),
                       fill=(255, 255, 255), font=font_shop_category_names)
-            draw.text(xy=(1500 + (1122 - shop_category_daily_width) // 2, 300), text="Ежедневные",
+            draw.text(xy=(1500 + (1122 - shop_category_daily_width) // 2, 320), text="Ежедневные".upper(),
                       fill=(255, 255, 255), font=font_shop_category_names)
 
             # Вставляем изображения рекомендуемых предметов

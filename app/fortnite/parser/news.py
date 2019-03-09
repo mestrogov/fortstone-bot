@@ -74,11 +74,12 @@ async def news():
             category_last_update_date_text = "Последнее обновление новостей {0} произошло {1} в {2} по московскому времени"
             font_news_header = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 144)
             font_news_categories = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 72)
-            font_news_ext = ImageFont.truetype("assets/fonts/RobotoCondensed-Regular.ttf", 48)
-            font_news_item_title = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 64)
-            font_news_item_body = ImageFont.truetype("assets/fonts/RobotoCondensed-Bold.ttf", 48)
+            font_news_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 48)
+            font_news_item_title = ImageFont.truetype("assets/fonts/Roboto-Black.ttf", 64)
+            font_news_item_body = ImageFont.truetype("assets/fonts/Roboto-Bold.ttf", 48)
 
             draw.text(xy=(100, 150), text="Новости в Фортнайте".upper(), fill=(255, 255, 255), font=font_news_header)
+            # draw.text(xy=(100, 250), text="https://t.me/fortnitearchives", fill=(173, 173, 173), font=font_news_ext)
 
             # Пишем заголовки для Королевской Битвы: Королевская Битва, дата последнего обновления новостей
             draw.text(xy=(100, 450), text="Королевская Битва", fill=(255, 255, 255), font=font_news_categories)
