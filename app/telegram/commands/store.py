@@ -17,13 +17,13 @@ def store(client, message):
         item_store_file_id = asyncio.get_event_loop().run_until_complete(Redis.execute(
             "GET", "fortnite:store:file_id:{0}".format(item_store_hash)))['details']
         if item_store_file_id and not config.DEVELOPER_MODE:
-            logging.info("Изображение магазина предметов уже было загружено в Telegram, "
+            logging.info("Изображение текущего магазина предметов уже было загружено в Telegram, "
                          "File ID: {0}.".format(item_store_file_id))
             client.send_photo(message.chat.id, item_store_file_id,
-                              caption="🛒 Вот, что находится в магазине предметов сегодня.")
+                              caption="🛒 Текущий магазин предметов в Фортнайте.")
         else:
             store_photo = client.send_photo(message.chat.id, item_store_file,
-                                            caption="🛒 Вот, что находится в магазине предметов сегодня.")
+                                            caption="🛒 Текущий магазин предметов в Фортнайте.")
             item_store_file_id = store_photo['photo']['sizes'][-1]['file_id']
             asyncio.get_event_loop().run_until_complete(Redis.execute(
                 "SET", "fortnite:store:file_id:{0}".format(item_store_hash), item_store_file_id, "EX", 86400))
