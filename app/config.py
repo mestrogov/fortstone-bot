@@ -26,6 +26,6 @@ try:
     # Настройки Redis
     REDIS_HOST = str(getenv("REDIS_HOST", "127.0.0.1"))
     REDIS_PORT = int(getenv("REDIS_PORT", 6379))
-except (KeyError, TypeError):
-    logging.critical("Произошла ошибка при попытке формирования конфигурационного файла.", exc_info=True)
+except:
+    logging.critical("Произошла ошибка при формировании настроек в конфигурационном файле.", exc_info=True)
     exit(1)

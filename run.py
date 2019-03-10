@@ -18,17 +18,17 @@ if __name__ == "__main__":
 
         telegram_client = telegram_get_client()
         Thread(target=telegram_client.start, name="telegram_client").start()
-        # Telegram клиенту нужно немного времени, чтобы запуститься
+        # Клиенту необходимо немного времени, чтобы запуститься
         sleep(1)
 
         fortnite_session = fortnite_get_session()
 
-        # Если в конфиге указан ID канала, то запускаем поток с публикованием ежедневного магазина
+        # Если в конфиге указан ID канала, то запускаем поток с публикованием различной информации в канал
         if config.CHANNEL_ID:
             Thread(target=channel_store_poster, args=(telegram_client,), name="channel_store_poster").start()
             Thread(target=channel_news_poster, args=(telegram_client,), name="channel_news_poster").start()
         else:
-            logging.info("ID канала не указан в конфигурационном файле, постинг магазина предметов, новостей в канал "
-                         "не будет работать.")
+            logging.info("Так как в конфигурациионом файле не указан ID канала, постинг различной информации "
+                         "в канал не будет работать.")
     except Exception as e:
         logging.critical("Произошла ошибка в работе приложения.", exc_info=True)
