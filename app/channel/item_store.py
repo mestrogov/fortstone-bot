@@ -44,7 +44,7 @@ async def post_async(client):
             assert item_store_channel['message_id']
             assert item_store_channel['time']
 
-            if int(item_store_channel['time']) - int(time()) < 3600:
+            if int(time()) - int(item_store_channel['time']) < 3600:
                 logging.info("Последний пост с магазином предметов был опубликован в канал меньше, "
                              "чем час назад, поэтому сообщение было отредактировано обновленным магазином.")
 
