@@ -24,17 +24,22 @@ async def news_item_parse(news_item, font_title, font_body):
     image = Image.new("RGBA", (2360, 522), (255, 0, 0))
     draw = ImageDraw.Draw(image)
 
+    # Вставляем изображение новости и рисуем рамку
     news_item_image = Image.open(news_item_file.name)
     news_item_image.thumbnail((1024, 512), Image.ANTIALIAS)
     news_item_image = ImageOps.expand(news_item_image, border=5, fill=(255, 255, 255))
     image.paste(news_item_image, (0, 0))
 
-    draw.rectangle(((1034, 0), (2360, 522)),
+    # Рисуем рамку для новости и выделяем цветом место текста (тела и заголовка) новости
+    draw.rectangle(((1029, 0), (2359, 521)),
                    width=5, outline=(255, 255, 255), fill=(50, 50, 50))
-    draw.rectangle(((1040, 5), (2355, 105)), fill=(25, 25, 38))
+    # Выделяем цветом название новости
+    draw.rectangle(((1034, 5), (2354, 105)), fill=(25, 25, 38))
 
-    draw.text(xy=(1070, 15), text=news_item['title'], fill=(255, 255, 255), font=font_title)
-    draw.multiline_text(xy=(1072, 120), text=wrap(news_item['body'], font_body, 1000),
+    # Пишем название новости
+    draw.text(xy=(1065, 15), text=news_item['title'], fill=(255, 255, 255), font=font_title)
+    # Пишем текст (тело) новости с ограничением строки до 1.000 пикселей
+    draw.multiline_text(xy=(1067, 120), text=wrap(news_item['body'], font_body, 1000),
                         fill=(255, 255, 255), font=font_body, align="left")
 
     image.save(news_item_file.name, "PNG")
@@ -78,6 +83,7 @@ async def news():
             font_news_item_title = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 58)
             font_news_item_body = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 48)
 
+            # Пишем заголовок для всех текущих новостей и дополнительный текст (копирайт)
             draw.text(xy=(100, 20), text="Новости в Фортнайте".upper(), fill=(255, 255, 255), font=font_news_header)
             draw.text(xy=(100, 120), text="https://t.me/fortnitearchives", fill=(173, 173, 173), font=font_news_ext)
 
@@ -87,7 +93,9 @@ async def news():
                 "Королевской Битвы", br_news_date.strftime("%d.%m.%Y"), br_news_date.strftime("%H:%M")
             ), fill=(173, 173, 173), font=font_news_ext)
 
+            # Переменная для обозначения координат места, куда будет помещена новость
             last_news_item_position = [100, 550]
+            # Вставляем изображение каждой новости Королевской Битвы
             for br_news_item in news_json['battleroyale']['news']:
                 try:
                     br_news_item_file = await news_item_parse(br_news_item, font_news_item_title, font_news_item_body)
@@ -105,6 +113,7 @@ async def news():
             ), fill=(173, 173, 173), font=font_news_ext)
             last_news_item_position = [last_news_item_position[0], last_news_item_position[1] + 310]
 
+            # Вставляем изображение каждой новости Сражения с Бурей
             for pve_news_item in news_json['savetheworld']['news']:
                 try:
                     pve_news_item_file = await news_item_parse(pve_news_item, font_news_item_title, font_news_item_body)
