@@ -4,17 +4,17 @@
 def translate_global_status(status):
     translated_global_statuses = {
         "All Systems Operational": "✅ Сервисы Epic Games работают в штатном режиме.",
-        "Service Under Maintenance": "🚨 Некоторые из сервисов Epic Games находятся на технических работах.",
+        "Service Under Maintenance": "🚧 Некоторые из сервисов Epic Games находятся на технических работах.",
         "Partially Degraded Service": "〽️ Некоторые из сервисов Epic Games работают с ухудшенной производительностью.",
-        "Minor System Outage": "⚠️ Некоторые из сервисов Epic Games частично недоступны.",
-        "Partial System Outage": "⚠️ Некоторые из сервисов Epic Games частично недоступны.",
-        "Major Service Outage": "❌ Большинство из сервисов Epic Games недоступны.",
+        "Minor Service Outage": "⚠️ Некоторые из сервисов Epic Games частично недоступны.",
+        "Partial System Outage": "️❌ Большинство из сервисов Epic Games частично недоступны.",
+        "Major Service Outage": "🚨 Сервисы Epic Games недоступны.",
     }
 
     try:
         return translated_global_statuses[status]
     except:
-        return f"⁉️ Сервисы Epic Games имеют статус: {status}."
+        return f"⁉️ Сервисы Epic Games не работают в штантном режиме, статус: {status}."
 
 
 def translate_service_name(service):
