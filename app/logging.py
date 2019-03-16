@@ -3,7 +3,6 @@
 import logging
 from app import config
 
-
 try:
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
@@ -29,4 +28,4 @@ try:
     consoleHandler.setFormatter(formatter)
     logger.addHandler(consoleHandler)
 except:
-    logging.critical("Exception has been occurred while trying to set up logging settings.", exc_info=True)
+    logging.critical("Произошла ошибка при установке настроек логирования.", exc_info=True)
