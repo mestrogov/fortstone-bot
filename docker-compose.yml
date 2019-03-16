@@ -11,6 +11,8 @@ services:
       - API_HASH=${API_HASH}
       - BOT_TOKEN=${BOT_TOKEN}
       - CHANNEL_ID=${CHANNEL_ID}
+      - VK_TOKEN=${VK_TOKEN}
+      - VK_COMMUNITY_ID=${VK_COMMUNITY_ID}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
     depends_on:
