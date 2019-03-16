@@ -18,7 +18,11 @@ def post(client):
     asyncio.set_event_loop(loop)
 
     while True:
-        asyncio.get_event_loop().run_until_complete(post_async(client))
+        try:
+            asyncio.get_event_loop().run_until_complete(post_async(client))
+        except Exception:
+            logging.error("Произошла ошибка при публикации ежедневного магазина предметов в канал.", exc_info=True)
+
         sleep(15)
 
 
@@ -36,7 +40,7 @@ async def post_async(client):
                                 "сообщения был обновлен в {} по московскому времени.__"
 
     if not item_store_channel or item_store_channel['hash'] != item_store_hash or config.DEVELOPER_MODE:
-        logging.info("Похоже, что магазин предметов в Фортнайте был обновлен. Публикуется его изображение в канал, "
+        logging.info("Магазин предметов в Фортнайте был обновлен. Публикуется его изображение в канал, "
                      "указанный в конфигурационном файле.")
 
         try:

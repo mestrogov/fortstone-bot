@@ -18,7 +18,11 @@ def post(client):
     asyncio.set_event_loop(loop)
 
     while True:
-        asyncio.get_event_loop().run_until_complete(post_async(client))
+        try:
+            asyncio.get_event_loop().run_until_complete(post_async(client))
+        except Exception:
+            logging.error("Произошла ошибка при публикации новостей в канал.", exc_info=True)
+
         sleep(15)
 
 
@@ -36,7 +40,7 @@ async def post_async(client):
                           "сообщения были обновлены в {} по московскому времени.__"
 
     if not news_channel or news_channel['hash'] != news_hash or config.DEVELOPER_MODE:
-        logging.info("Похоже, что новости в Фортнайте были обновлены. Публикуется их изображение в канал, "
+        logging.info("Новости в Фортнайте были обновлены. Публикуется их изображение в канал, "
                      "указанный в конфигурационном файле.")
 
         try:
