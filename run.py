@@ -3,7 +3,7 @@
 from app import config
 from app.remote.redis import Redis as redis
 from app.telegram.app import get_client as telegram_get_client
-from app.channel.item_store import post as channel_store_poster
+from app.channel.store import post as channel_store_poster
 from app.channel.news import post as channel_news_poster
 from threading import Thread
 from time import sleep

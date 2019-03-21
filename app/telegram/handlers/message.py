@@ -8,7 +8,7 @@ import logging
 
 
 def message(client, message):
-    logging.critical(message)
+    logging.debug(f"Получено новое сообщение:\n{message}")
     if message['chat']['id'] == config.CHANNEL_ID and config.VK_TOKEN and config.VK_COMMUNITY_ID:
         vk_client = vk_session(config.VK_TOKEN, version=5.92)
         logging.debug(f"Клиент VK: {vk_client}.")

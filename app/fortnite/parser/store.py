@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
-from app import config
 from app.remote.redis import Redis
 from app.fortnite.parser.utils import store_colors
 from tempfile import NamedTemporaryFile
@@ -17,24 +16,23 @@ import requests
 import asyncio
 
 
-async def store():
+async def store(ignore_cache=False):
     try:
-        api_store_url = "https://fortnite-public-api.theapinetwork.com/prod09/store/get?language=en"
+        if ignore_cache:
+            logging.info("Изображение текущего магазина предметов запрошено с игнорированием кэша.")
 
+        api_store_url = "https://fortnite-public-api.theapinetwork.com/prod09/store/get?language=en"
         store_json = (await Redis.execute("GET", "fortnite:store:json"))['details']
-        if store_json and not config.DEVELOPER_MODE:
+        if store_json and not ignore_cache:
             store_json = json.loads(store_json)
         else:
             store_json = requests.get(api_store_url).json()
             await Redis.execute("SET", "fortnite:store:json", json.dumps(store_json), "EX", 20)
 
-        # JSON для тестирования с малым количеством элементов
-        # store_json = {"date_layout": "day-month-year", "lastupdate": 1551571214, "language": "en", "date": "29-05-52", "rows": 13, "vbucks": "https://fortnite-public-files.theapinetwork.com/fortnite-vbucks-icon.png","items":[{"itemid":"76fe82f-693c99a-d3297b4-bdf9d31","name":"Reflex","cost":"1200","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/b351f01a4c2701640183c1aa431eb8ba.png","background":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31.png","information":"https://fortnite-public-files.theapinetwork.com/image/76fe82f-693c99a-d3297b4-bdf9d31/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/76fe82f-693c99a-d3297b4-bdf9d31.png"}},"captial":"outfit","type":"outfit","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.98,"totalPoints":648,"numberVotes":163}},{"itemid":"43f67c0-cda8fda-0d630f1-ba345d8","name":"Flimsie Flail","cost":"800","featured":1,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/pickaxe/31fc27b63ca5bf097b9d45ab7c8b63e3.png","background":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8.png","information":"https://fortnite-public-files.theapinetwork.com/image/43f67c0-cda8fda-0d630f1-ba345d8/item.png","featured":{"transparent":None}},"captial":"pickaxe","type":"pickaxe","rarity":"rare","obtained_type":"vbucks"},"ratings":{"avgStars":3.97,"totalPoints":850,"numberVotes":214}},{"itemid":"8199036-3210242-6480297-c657fa5","name":"Maverick","cost":"1500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/outfit/5af0736803f924f768be3f41af7937d6.png","background":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5.png","information":"https://fortnite-public-files.theapinetwork.com/image/8199036-3210242-6480297-c657fa5/item.png","featured":{"transparent":"https://fortnite-public-files.theapinetwork.com/featured/8199036-3210242-6480297-c657fa5.png"}},"captial":"outfit","type":"outfit","rarity":"epic","obtained_type":"vbucks"},"ratings":{"avgStars":4.02,"totalPoints":494,"numberVotes":123}},{"itemid":"0896bd2-34ccd96-2cd9ff0-30f47cf","name":"Hyper","cost":"500","featured":0,"refundable":1,"lastupdate":1551571213,"youtube":None,"item":{"image":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","images":{"transparent":"https://fortnite-public-files.theapinetwork.com/glider/5ef159e2f3745ee15abe986206a16af6.png","background":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf.png","information":"https://fortnite-public-files.theapinetwork.com/image/0896bd2-34ccd96-2cd9ff0-30f47cf/item.png","featured":{"transparent":None}},"captial":"glider","type":"glider","rarity":"uncommon","obtained_type":"vbucks"},"ratings":{"avgStars":3.05,"totalPoints":195,"numberVotes":64}}]}
-
         store_hash = sha1(str(store_json['lastupdate']).encode("UTF-8")).hexdigest()
 
         store_file = (await Redis.execute("GET", "fortnite:store:file:{0}".format(store_hash)))['details']
-        if store_file and isfile(store_file) and not config.DEVELOPER_MODE:
+        if store_file and isfile(store_file) and not ignore_cache:
             logging.info("Изображение текущего магазина предметов уже сгенерировано, файл: {0}.".format(store_file))
         else:
             store_file = NamedTemporaryFile(suffix=".png", delete=False)
@@ -207,6 +205,6 @@ async def store():
 
 if __name__ == "__main__":
     try:
-        asyncio.get_event_loop().run_until_complete(store())
+        asyncio.get_event_loop().run_until_complete(store(ignore_cache=True))
     except KeyboardInterrupt:
         pass

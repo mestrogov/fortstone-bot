@@ -39,7 +39,7 @@ async def post_async(client):
     item_store_caption_edited = f"{item_store_caption}\n\n__Магазин предметов после оригинальной публикации " \
                                 "сообщения был обновлен в {} по московскому времени.__"
 
-    if not item_store_channel or item_store_channel['hash'] != item_store_hash or config.DEVELOPER_MODE:
+    if not item_store_channel or item_store_channel['hash'] != item_store_hash:
         logging.info("Магазин предметов в Фортнайте был обновлен. Публикуется его изображение в канал, "
                      "указанный в конфигурационном файле.")
 

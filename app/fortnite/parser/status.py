@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
-from app import config
 from app import utils
 from app.remote.redis import Redis
 from app.fortnite.parser.utils import status_translations
@@ -15,7 +14,7 @@ async def status():
         api_status_url = "https://status.epicgames.com/api/v2/summary.json"
 
         f_status = (await Redis.execute("GET", "fortnite:status"))['details']
-        if f_status and not config.DEVELOPER_MODE:
+        if f_status:
             f_status = json.loads(f_status)
         else:
             f_status = requests.get(api_status_url).json()

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
-from app import config
 from app.remote.redis import Redis
 from app.fortnite.parser.news import news as parse_news
 import logging
@@ -17,7 +16,7 @@ def news(client, message):
         news_file_id = asyncio.get_event_loop().run_until_complete(Redis.execute(
             "GET", "fortnite:news:file_id:{0}".format(news_hash)))['details']
 
-        if news_file_id and not config.DEVELOPER_MODE:
+        if news_file_id:
             logging.info("Изображение текущих новостей уже было загружено в Telegram, "
                          "File ID: {0}.".format(news_file_id))
 

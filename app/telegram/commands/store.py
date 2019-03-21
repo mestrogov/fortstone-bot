@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
-from app import config
 from app.remote.redis import Redis
 from app.fortnite.parser.store import store as parse_item_store
 import logging
@@ -17,7 +16,7 @@ def store(client, message):
         item_store_file_id = asyncio.get_event_loop().run_until_complete(Redis.execute(
             "GET", "fortnite:store:file_id:{0}".format(item_store_hash)))['details']
 
-        if item_store_file_id and not config.DEVELOPER_MODE:
+        if item_store_file_id:
             logging.info("Изображение текущего магазина предметов уже было загружено в Telegram, "
                          "File ID: {0}.".format(item_store_file_id))
 

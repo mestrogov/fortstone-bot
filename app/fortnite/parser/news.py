@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from app import logging
-from app import config
 from app.remote.redis import Redis
 from app.fortnite.parser.utils.multiline_text_wrap import wrap
 from app.fortnite.wrapper.fortnite import Fortnite
@@ -46,10 +45,13 @@ async def news_item_parse(news_item, font_title, font_body):
     return news_item_file.name
 
 
-async def news():
+async def news(ignore_cache=False):
     try:
+        if ignore_cache:
+            logging.info("Изображение текущих новостей запрошено с игнорированием кэша.")
+
         news_json = (await Redis.execute("GET", "fortnite:news:json"))['details']
-        if news_json and not config.DEVELOPER_MODE:
+        if news_json and not ignore_cache:
             news_json = json.loads(news_json)
         else:
             news_json = Fortnite.ingame_news()
@@ -60,7 +62,7 @@ async def news():
         ).hexdigest()
 
         news_file = (await Redis.execute("GET", "fortnite:news:file:{0}".format(news_hash)))['details']
-        if news_file and isfile(news_file) and not config.DEVELOPER_MODE:
+        if news_file and isfile(news_file) and not ignore_cache:
             logging.info("Изображение текущих новостей уже сгенерировано, файл: {0}.".format(news_file))
         else:
             news_file = NamedTemporaryFile(suffix=".png", delete=False)
@@ -136,6 +138,6 @@ async def news():
 
 if __name__ == "__main__":
     try:
-        asyncio.get_event_loop().run_until_complete(news())
+        asyncio.get_event_loop().run_until_complete(news(ignore_cache=True))
     except KeyboardInterrupt:
         pass

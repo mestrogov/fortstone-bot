@@ -39,7 +39,7 @@ async def post_async(client):
     news_caption_edited = f"{news_caption}\n\n__Новости после оригинальной публикации " \
                           "сообщения были обновлены в {} по московскому времени.__"
 
-    if not news_channel or news_channel['hash'] != news_hash or config.DEVELOPER_MODE:
+    if not news_channel or news_channel['hash'] != news_hash:
         logging.info("Новости в Фортнайте были обновлены. Публикуется их изображение в канал, "
                      "указанный в конфигурационном файле.")
 
