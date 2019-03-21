@@ -33,12 +33,12 @@ async def news_item_parse(news_item, font_title, font_body):
     draw.rectangle(((1029, 0), (2359, 521)),
                    width=5, outline=(255, 255, 255), fill=(50, 50, 50))
     # Выделяем цветом название новости
-    draw.rectangle(((1034, 5), (2354, 105)), fill=(25, 25, 38))
+    draw.rectangle(((1034, 5), (2354, 106)), fill=(25, 25, 38))
 
     # Пишем название новости
-    draw.text(xy=(1065, 15), text=news_item['title'], fill=(255, 255, 255), font=font_title)
+    draw.text(xy=(1064, 15), text=news_item['title'], fill=(255, 255, 255), font=font_title)
     # Пишем текст (тело) новости с ограничением строки до 1.000 пикселей
-    draw.multiline_text(xy=(1067, 120), text=wrap(news_item['body'], font_body, 1000),
+    draw.multiline_text(xy=(1066, 123), text=wrap(news_item['body'], font_body, 1000),
                         fill=(255, 255, 255), font=font_body, align="left")
 
     image.save(news_item_file.name, "PNG")
@@ -72,60 +72,68 @@ async def news(ignore_cache=False):
                 news_file.name)
             )
 
-            image = Image.new("RGBA", (2560, 10240), (35, 35, 35))
+            image = Image.new("RGBA", (5120, 10240), (35, 35, 35))
             draw = ImageDraw.Draw(image)
 
-            # Необходимые переменные: даты последнего обновления, шаблон текста для обновления, шрифты
+            # Переменные для изменения текста на изображении
+            news_header_text = "Новости в Фортнайте".upper()
+            news_ext_text = "Больше новостей по Фортнайту вы можете найти в нашем Telegram или VK: @fortnitearchives"
+            category_last_update_date_text = "Обновление новостей {0} произошло {1} в {2} по московскому времени"
+            # Технические переменные: шрифты, время
             br_news_date = utils.convert_to_moscow(utils.convert_iso_time(news_json['battleroyale']['last_modified']))
             pve_news_date = utils.convert_to_moscow(utils.convert_iso_time(news_json['savetheworld']['last_modified']))
-            category_last_update_date_text = "Обновление новостей {0} произошло {1} в {2} по московскому времени"
             font_news_header = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 80)
-            font_news_categories = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
             font_news_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 48)
+            font_news_categories = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
             font_news_item_title = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 58)
             font_news_item_body = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 48)
 
-            # Пишем заголовок для всех текущих новостей и дополнительный текст (копирайт)
-            draw.text(xy=(100, 20), text="Новости в Фортнайте".upper(), fill=(255, 255, 255), font=font_news_header)
-            draw.text(xy=(100, 120), text="https://t.me/fortnitearchives", fill=(173, 173, 173), font=font_news_ext)
+            # Пишем заголовок новостей (например: Новости в Фортнайте) и дополнительную информацию
+            news_header_width, news_header_height = draw.textsize(news_header_text, font=font_news_header)
+            news_ext_width, news_ext_height = draw.textsize(news_ext_text, font=font_news_ext)
+            draw.text(xy=((5120 - news_header_width) // 2, 20), text=news_header_text, fill=(255, 255, 255),
+                      font=font_news_header)
+            draw.text(xy=((5120 - news_ext_width) // 2, 120), text=news_ext_text, fill=(173, 173, 173),
+                      font=font_news_ext)
 
             # Пишем заголовки для Королевской Битвы: Королевская Битва, дата последнего обновления новостей
-            draw.text(xy=(100, 320), text="Королевская Битва", fill=(255, 255, 255), font=font_news_categories)
-            draw.text(xy=(100, 400), text=category_last_update_date_text.format(
+            draw.text(xy=(100, 300), text="Королевская Битва", fill=(255, 255, 255), font=font_news_categories)
+            draw.text(xy=(100, 380), text=category_last_update_date_text.format(
                 "Королевской Битвы", br_news_date.strftime("%d.%m.%Y"), br_news_date.strftime("%H:%M")
             ), fill=(173, 173, 173), font=font_news_ext)
 
             # Переменная для обозначения координат места, куда будет помещена новость
-            last_news_item_position = [100, 550]
+            br_last_news_item_position = [100, 525]
             # Вставляем изображение каждой новости Королевской Битвы
             for br_news_item in news_json['battleroyale']['news']:
                 try:
                     br_news_item_file = await news_item_parse(br_news_item, font_news_item_title, font_news_item_body)
-                    image.paste(Image.open(br_news_item_file), tuple(last_news_item_position))
-                    last_news_item_position = [last_news_item_position[0], last_news_item_position[1] + 600]
+                    image.paste(Image.open(br_news_item_file), tuple(br_last_news_item_position))
+                    br_last_news_item_position = [br_last_news_item_position[0], br_last_news_item_position[1] + 622]
                 except:
                     logging.error("Произошла ошибка при парсировании новостей Королевской Битвы.", exc_info=True)
                     continue
 
             # Пишем заголовки для Сражения с Бурей: Сражение с Бурей, дата последнего обновления новостей
-            draw.text(xy=(100, last_news_item_position[1] + 80), text="Сражение с Бурей", fill=(255, 255, 255),
+            draw.text(xy=(2660, 300), text="Сражение с Бурей", fill=(255, 255, 255),
                       font=font_news_categories)
-            draw.text(xy=(100, last_news_item_position[1] + 160), text=category_last_update_date_text.format(
+            draw.text(xy=(2660, 380), text=category_last_update_date_text.format(
                 "Сражения с Бурей", pve_news_date.strftime("%d.%m.%Y"), pve_news_date.strftime("%H:%M")
             ), fill=(173, 173, 173), font=font_news_ext)
-            last_news_item_position = [last_news_item_position[0], last_news_item_position[1] + 310]
 
+            # Переменная для обозначения координат места, куда будет помещена новость
+            pve_last_news_item_position = [2660, 525]
             # Вставляем изображение каждой новости Сражения с Бурей
             for pve_news_item in news_json['savetheworld']['news']:
                 try:
                     pve_news_item_file = await news_item_parse(pve_news_item, font_news_item_title, font_news_item_body)
-                    image.paste(Image.open(pve_news_item_file), tuple(last_news_item_position))
-                    last_news_item_position = [last_news_item_position[0], last_news_item_position[1] + 600]
+                    image.paste(Image.open(pve_news_item_file), tuple(pve_last_news_item_position))
+                    pve_last_news_item_position = [pve_last_news_item_position[0], pve_last_news_item_position[1] + 622]
                 except:
                     logging.error("Произошла ошибка при парсировании новостей Сражения с Бурей.", exc_info=True)
                     continue
 
-            image = image.crop((0, 0, 2560, last_news_item_position[1]))
+            image = image.crop((0, 0, 5120, max([br_last_news_item_position[1], pve_last_news_item_position[1]])))
             image.save(news_file.name, "PNG")
 
             news_file = news_file.name
