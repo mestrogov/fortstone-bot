@@ -21,10 +21,10 @@ def news(client, message):
                          "File ID: {0}.".format(news_file_id))
 
             client.send_photo(message.chat.id, news_file_id,
-                              caption="📰 Текущие новости Королевской Битвы и Сражения с Бурей.")
+                              caption="📰 Текущие внутриигровые новости Королевской Битвы и Сражения с Бурей.")
         else:
             message = client.send_photo(message.chat.id, news_file,
-                                        caption="📰 Текущие новости Королевской Битвы и Сражения с Бурей.")
+                                        caption="📰 Текущие внутриигровые новости Королевской Битвы и Сражения с Бурей.")
             news_file_id = message['photo']['sizes'][-1]['file_id']
 
             asyncio.get_event_loop().run_until_complete(Redis.execute(

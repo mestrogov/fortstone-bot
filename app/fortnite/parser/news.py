@@ -23,6 +23,12 @@ async def news_item_parse(news_item, font_title, font_body):
     image = Image.new("RGBA", (2360, 522), (255, 0, 0))
     draw = ImageDraw.Draw(image)
 
+    # Проверка наличия места для рекламы (adspace)
+    try:
+        adspace = news_item['adspace']
+    except KeyError:
+        adspace = None
+
     # Вставляем изображение новости и рисуем рамку
     news_item_image = Image.open(news_item_file.name)
     news_item_image.thumbnail((1024, 512), Image.ANTIALIAS)
@@ -57,9 +63,10 @@ async def news(ignore_cache=False):
             news_json = Fortnite.ingame_news()
             await Redis.execute("SET", "fortnite:news:json", json.dumps(news_json), "EX", 20)
 
-        news_hash = sha1(
-            str(news_json['battleroyale']['last_modified'] + news_json['savetheworld']['last_modified']).encode("UTF-8")
-        ).hexdigest()
+        news_hash = sha1(str(
+            news_json['battleroyale']['last_modified'] + news_json['savetheworld']['last_modified'] +
+            news_json['emergencynotice']['last_modified']
+        ).encode("UTF-8")).hexdigest()
 
         news_file = (await Redis.execute("GET", "fortnite:news:file:{0}".format(news_hash)))['details']
         if news_file and isfile(news_file) and not ignore_cache:
@@ -76,8 +83,8 @@ async def news(ignore_cache=False):
             draw = ImageDraw.Draw(image)
 
             # Переменные для изменения текста на изображении
-            news_header_text = "Новости в Фортнайте".upper()
-            news_ext_text = "Больше новостей по Фортнайту вы можете найти в нашем Telegram или VK: @fortnitearchives"
+            news_header_text = "Внутриигровые новости в Фортнайте".upper()
+            news_ext_text = "Больше разнообразных новостей в группе ВКонтакте или канале Telegram: @fortnitearchives"
             category_last_update_date_text = "Обновление новостей {0} произошло {1} в {2} по московскому времени"
             # Технические переменные: шрифты, время
             br_news_date = utils.convert_to_moscow(utils.convert_iso_time(news_json['battleroyale']['last_modified']))
@@ -111,7 +118,8 @@ async def news(ignore_cache=False):
                     image.paste(Image.open(br_news_item_file), tuple(br_last_news_item_position))
                     br_last_news_item_position = [br_last_news_item_position[0], br_last_news_item_position[1] + 622]
                 except:
-                    logging.error("Произошла ошибка при парсировании новостей Королевской Битвы.", exc_info=True)
+                    logging.error("Произошла ошибка при парсировании элемента новостей Королевской Битвы.",
+                                  exc_info=True)
                     continue
 
             # Пишем заголовки для Сражения с Бурей: Сражение с Бурей, дата последнего обновления новостей
@@ -130,7 +138,8 @@ async def news(ignore_cache=False):
                     image.paste(Image.open(pve_news_item_file), tuple(pve_last_news_item_position))
                     pve_last_news_item_position = [pve_last_news_item_position[0], pve_last_news_item_position[1] + 622]
                 except:
-                    logging.error("Произошла ошибка при парсировании новостей Сражения с Бурей.", exc_info=True)
+                    logging.error("Произошла ошибка при парсировании элемента новостей Сражения с Бурей.",
+                                  exc_info=True)
                     continue
 
             image = image.crop((0, 0, 5120, max([br_last_news_item_position[1], pve_last_news_item_position[1]])))

@@ -54,7 +54,25 @@ class Fortnite:
     def ingame_news():
         """Get the current news on fortnite from battle royale and save the world."""
         response = Session.get_noauth(endpoint=constants.INGAME_NEWS, headers={'Accept-Language': 'ru'})
+
+        # Парсирование экстренных сообщений для Королевской Битвы и Сражения с Бурей
+        for notice_message in response['emergencynotice']['news']['messages']:
+            notice = {
+                # TODO: Заменить на адекватную картинку со смыслом экстренности
+                "image": "https://cdn2.unrealengine.com/Fortnite/fortnite-game/battleroyalenews/v811/08BR_Social_The-Laguna-Legends_MOTD-1024x512-6710af6d031d4168eb3e16b4458267198c76e390.jpg",
+                "adspace": "ЭКСТРЕННОЕ СООБЩЕНИЕ!",
+                "title": notice_message['title'],
+                "body": notice_message['body'],
+            }
+            if notice_message['subgame'] == "stw":
+                response['savetheworldnews']['news']['messages'].insert(0, notice)
+            else:
+                response['battleroyalenews']['news']['messages'].insert(0, notice)
+
         ingame_news = {
+            "emergencynotice": {
+                "last_modified": response['emergencynotice']['lastModified'],
+            },
             "battleroyale": {
                 "last_modified": response['battleroyalenews']['lastModified'],
                 "locale": response['battleroyalenews']['_locale'],
@@ -66,6 +84,7 @@ class Fortnite:
                 "news": response['savetheworldnews']['news']['messages']
             }
         }
+
         return ingame_news
 
     @staticmethod
