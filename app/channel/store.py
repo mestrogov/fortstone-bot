@@ -3,7 +3,7 @@
 from app import logging
 from app import config
 from app.remote.redis import Redis
-from app.fortnite.parser.store import store as parse_item_store
+from app.fortnite.parser.store import store as parse_store
 from app.utils import convert_to_moscow
 from pyrogram import InputMediaPhoto
 from itertools import zip_longest
@@ -21,7 +21,7 @@ def post(client):
         try:
             asyncio.get_event_loop().run_until_complete(post_async(client))
         except Exception:
-            logging.error("Произошла ошибка при публикации ежедневного магазина предметов в канал.", exc_info=True)
+            logging.error("Произошла ошибка при публикации магазина в канал.", exc_info=True)
 
         sleep(15)
 
@@ -32,37 +32,37 @@ async def redis_hgetall(key):
 
 
 async def post_async(client):
-    item_store_channel = (await redis_hgetall("fortnite:store:channel"))
-    item_store_file, item_store_hash = await parse_item_store()
+    store_channel = (await redis_hgetall("fortnite:store:channel"))
+    store_file, store_hash = await parse_store()
 
-    item_store_caption = "🛒 Магазин предметов в Фортнайте был обновлен. #магазин"
-    item_store_caption_edited = f"{item_store_caption}\n\n__Магазин предметов после оригинальной публикации " \
-                                "сообщения был обновлен в {} по московскому времени.__"
+    store_caption = "🛒 Магазин предметов в Фортнайте был обновлен. #магазин"
+    store_caption_edited = f"{store_caption}\n\n__Магазин после оригинальной публикации " \
+                           "сообщения был обновлен в {} по московскому времени.__"
 
-    if not item_store_channel or item_store_channel['hash'] != item_store_hash:
-        logging.info("Магазин предметов в Фортнайте был обновлен. Публикуется его изображение в канал, "
+    if not store_channel or store_channel['hash'] != store_hash:
+        logging.info("Магазин в Фортнайте был обновлен. Публикуется его изображение в канал, "
                      "указанный в конфигурационном файле.")
 
         try:
-            assert item_store_channel['chat_id']
-            assert item_store_channel['message_id']
-            assert item_store_channel['time']
+            assert store_channel['chat_id']
+            assert store_channel['message_id']
+            assert store_channel['time']
 
-            if int(time()) - int(item_store_channel['time']) < 3600:
-                logging.info("Последний пост с магазином предметов был опубликован в канал меньше, "
+            if int(time()) - int(store_channel['time']) < 3600:
+                logging.info("Последний пост с магазином был опубликован в канал меньше, "
                              "чем час назад, поэтому сообщение было отредактировано обновленным магазином.")
 
                 message = client.edit_message_media(
-                    int(item_store_channel['chat_id']), int(item_store_channel['message_id']),
-                    media=InputMediaPhoto(item_store_file, caption=item_store_caption_edited.format(
+                    int(store_channel['chat_id']), int(store_channel['message_id']),
+                    media=InputMediaPhoto(store_file, caption=store_caption_edited.format(
                         convert_to_moscow(datetime.utcnow()).strftime("%H:%M:%S")
                     )))
             else:
                 raise AssertionError
         except (AssertionError, TypeError, KeyError):
-            message = client.send_photo(config.CHANNEL_ID, item_store_file, caption=item_store_caption)
+            message = client.send_photo(config.CHANNEL_ID, store_file, caption=store_caption)
 
-        await Redis.execute("HSET", "fortnite:store:channel", "hash", item_store_hash, "chat_id", message['chat']['id'],
+        await Redis.execute("HSET", "fortnite:store:channel", "hash", store_hash, "chat_id", message['chat']['id'],
                             "message_id", message['message_id'], "time", int(time()))
         await Redis.execute("EXPIRE", "fortnite:store:channel", 86400)
 

@@ -21,7 +21,7 @@ if __name__ == "__main__":
         sleep(1)
 
         # Если в конфигурационном файле указан ID канала, то будет работатьпубликация автоматических постов
-        # с новостями и магазином предметов
+        # с новостями и магазином
         if config.CHANNEL_ID:
             Thread(target=channel_store_poster, args=(telegram_client,), name="channel_store_poster").start()
             Thread(target=channel_news_poster, args=(telegram_client,), name="channel_news_poster").start()

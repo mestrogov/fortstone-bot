@@ -84,7 +84,7 @@ async def news(ignore_cache=False):
 
             # Переменные для изменения текста на изображении
             news_header_text = "Внутриигровые новости в Фортнайте".upper()
-            news_ext_text = "Больше разнообразных новостей в группе ВКонтакте или канале Telegram: @fortnitearchives"
+            news_ext_text = "Больше новостей в группе ВКонтакте или канале Telegram: @fortnitearchives"
             category_last_update_date_text = "Обновление новостей {0} произошло {1} в {2} по московскому времени"
             # Технические переменные: шрифты, время
             br_news_date = utils.convert_to_moscow(utils.convert_iso_time(news_json['battleroyale']['last_modified']))

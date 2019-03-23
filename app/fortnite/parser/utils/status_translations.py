@@ -28,7 +28,7 @@ def translate_service_name(service):
         "Voice Chat": "Голосовой чат",
         "Matchmaking": "Поиск матчей",
         "Stats and Leaderboards": "Статистика и список лидеров",
-        "Store": "Внутриигровой магазин"
+        "Store": "Внутриигровой магазин предметов"
     }
 
     try:

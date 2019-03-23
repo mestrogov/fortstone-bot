@@ -19,7 +19,7 @@ import asyncio
 async def store(ignore_cache=False):
     try:
         if ignore_cache:
-            logging.info("Изображение текущего магазина предметов запрошено с игнорированием кэша.")
+            logging.info("Изображение текущего магазина запрошено с игнорированием кэша.")
 
         api_store_url = "https://fortnite-public-api.theapinetwork.com/prod09/store/get?language=en"
         store_json = (await Redis.execute("GET", "fortnite:store:json"))['details']
@@ -33,7 +33,7 @@ async def store(ignore_cache=False):
 
         store_file = (await Redis.execute("GET", "fortnite:store:file:{0}".format(store_hash)))['details']
         if store_file and isfile(store_file) and not ignore_cache:
-            logging.info("Изображение текущего магазина предметов уже сгенерировано, файл: {0}.".format(store_file))
+            logging.info("Изображение текущего магазина уже сгенерировано, файл: {0}.".format(store_file))
         else:
             store_file = NamedTemporaryFile(suffix=".png", delete=False)
             featured_items_files = []
@@ -132,12 +132,12 @@ async def store(ignore_cache=False):
                                   exc_info=True)
                     continue
 
-            logging.debug("Изображение магазина предметов сохраняется во временный файл: {0}.".format(store_file.name))
+            logging.debug("Изображение магазина сохраняется во временный файл: {0}.".format(store_file.name))
 
             image = Image.new("RGBA", (2700, 10240), (35, 35, 35))
             draw = ImageDraw.Draw(image)
 
-            # Необходимые переменные: описание магазина предметов (дата, подробности), шрифты
+            # Необходимые переменные: описание магазина (дата, подробности), шрифты
             shop_date = pytz.utc.localize(datetime.datetime.strptime(store_json['date'], "%d-%m-%y")).astimezone(
                 pytz.timezone("Europe/Moscow"))
             shop_text = "Магазин предметов в Фортнайте".upper()
@@ -146,7 +146,7 @@ async def store(ignore_cache=False):
             font_shop_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 56)
             font_shop_category_names = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
 
-            # Пишем дату магазина предметов и дополнительный текст (подробности)
+            # Пишем дату магазина и дополнительный текст (подробности)
             shop_text_width, shop_text_height = draw.textsize(shop_text, font=font_shop_text)
             shop_ext_width, shop_ext_height = draw.textsize(shop_ext, font=font_shop_ext)
             draw.text(xy=((2700 - shop_text_width) // 2, 20), text=shop_text,
@@ -200,8 +200,8 @@ async def store(ignore_cache=False):
 
         return store_file, store_hash
     except Exception:
-        logging.error("Произошла ошибка при генерации изображения магазина предметов в Фортнайте.", exc_info=True)
-        return "Произошла ошибка при генерации изображения магазина предметов в Фортнайте."
+        logging.error("Произошла ошибка при генерации изображения магазина в Фортнайте.", exc_info=True)
+        return "Произошла ошибка при генерации изображения магазина в Фортнайте."
 
 if __name__ == "__main__":
     try:
