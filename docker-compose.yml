@@ -7,10 +7,11 @@ services:
     environment:
       - VERSION=${VERSION}
       - DEVELOPER_MODE=${DEVELOPER_MODE}
+      - FNBR_API_KEY=${FNBR_API_KEY}
+      - CHANNEL_ID=${CHANNEL_ID}
       - API_ID=${API_ID}
       - API_HASH=${API_HASH}
       - BOT_TOKEN=${BOT_TOKEN}
-      - CHANNEL_ID=${CHANNEL_ID}
       - VK_TOKEN=${VK_TOKEN}
       - VK_COMMUNITY_ID=${VK_COMMUNITY_ID}
       - REDIS_HOST=${REDIS_HOST}
