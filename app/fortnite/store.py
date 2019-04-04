@@ -113,7 +113,7 @@ async def store(ignore_cache=False):
             await Redis.execute("SET", "fortnite:store:json", json.dumps(store_json), "EX", 20)
 
         if not store_json['status'] == 200:
-            logging.error("Произошла ошибка при получении текущего магазина. API вернуло неуспешный статус.{0}".format(
+            logging.error("Произошла ошибка при получении текущего магазина. API вернуло неуспешный статус. {0}".format(
                 store_json)
             )
             return
@@ -166,28 +166,38 @@ async def store(ignore_cache=False):
             # Вставляем изображения рекомендуемых предметов
             last_featured_item_location = [78, 468]
             for num, featured_item_json in enumerate(store_json['featured'], 1):
-                featured_item_image = Image.open(await item_parse(featured_item_json))
-                if num == 1:
-                    image.paste(featured_item_image, tuple(last_featured_item_location))
-                elif num % 2 == 0:
-                    last_featured_item_location[0] = last_featured_item_location[0] + 600
-                    image.paste(featured_item_image, tuple(last_featured_item_location))
-                else:
-                    last_featured_item_location = [last_featured_item_location[0] - 600, last_featured_item_location[1] + 600]
-                    image.paste(featured_item_image, tuple(last_featured_item_location))
+                try:
+                    featured_item_image = Image.open(await item_parse(featured_item_json))
+                    if num == 1:
+                        image.paste(featured_item_image, tuple(last_featured_item_location))
+                    elif num % 2 == 0:
+                        last_featured_item_location[0] = last_featured_item_location[0] + 600
+                        image.paste(featured_item_image, tuple(last_featured_item_location))
+                    else:
+                        last_featured_item_location = [last_featured_item_location[0] - 600, last_featured_item_location[1] + 600]
+                        image.paste(featured_item_image, tuple(last_featured_item_location))
+                except:
+                    logging.error("Произошла ошибка при генерировании фотографии для рекомендуемого предмета.",
+                                  exc_info=True)
+                    continue
 
             # Вставляем изображения ежедневных предметов
             last_daily_item_location = [1500, 468]
             for num, daily_item_json in enumerate(store_json['daily'], 1):
-                daily_item = Image.open(await item_parse(daily_item_json))
-                if num == 1:
-                    image.paste(daily_item, tuple(last_daily_item_location))
-                elif num % 2 == 0:
-                    last_daily_item_location[0] = last_daily_item_location[0] + 600
-                    image.paste(daily_item, tuple(last_daily_item_location))
-                else:
-                    last_daily_item_location = [last_daily_item_location[0] - 600, last_daily_item_location[1] + 600]
-                    image.paste(daily_item, tuple(last_daily_item_location))
+                try:
+                    daily_item = Image.open(await item_parse(daily_item_json))
+                    if num == 1:
+                        image.paste(daily_item, tuple(last_daily_item_location))
+                    elif num % 2 == 0:
+                        last_daily_item_location[0] = last_daily_item_location[0] + 600
+                        image.paste(daily_item, tuple(last_daily_item_location))
+                    else:
+                        last_daily_item_location = [last_daily_item_location[0] - 600, last_daily_item_location[1] + 600]
+                        image.paste(daily_item, tuple(last_daily_item_location))
+                except:
+                    logging.error("Произошла ошибка при генерировании фотографии для ежедневного предмета.",
+                                  exc_info=True)
+                    continue
 
             # Обрезаем изображение до необходимых размеров
             shop_category_widths = [last_featured_item_location[1], last_daily_item_location[1]]
