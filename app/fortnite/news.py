@@ -2,8 +2,7 @@
 
 from app import logging
 from app.remote.redis import Redis
-from app.fortnite.parser.utils.multiline_text_wrap import wrap
-from app.fortnite.wrapper.fortnite import Fortnite
+from app.fortnite.utils.multiline_text_wrap import wrap
 from app import utils
 from tempfile import NamedTemporaryFile
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -13,6 +12,43 @@ import json
 import logging
 import requests
 import asyncio
+
+
+def parse_ingame_news():
+    news_api_url = "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game"
+    response = requests.get(news_api_url, headers={"Accept-Language": "ru"}).json()
+
+    # Парсирование экстренных сообщений для Королевской Битвы и Сражения с Бурей
+    for notice_message in response['emergencynotice']['news']['messages']:
+        notice = {
+            # TODO: Заменить на адекватную картинку со смыслом экстренности
+            "image": "https://cdn2.unrealengine.com/Fortnite/fortnite-game/battleroyalenews/v811/08BR_Social_The-Laguna-Legends_MOTD-1024x512-6710af6d031d4168eb3e16b4458267198c76e390.jpg",
+            "adspace": "ЭКСТРЕННОЕ СООБЩЕНИЕ!",
+            "title": notice_message['title'],
+            "body": notice_message['body'],
+        }
+        if notice_message['subgame'] == "stw":
+            response['savetheworldnews']['news']['messages'].insert(0, notice)
+        else:
+            response['battleroyalenews']['news']['messages'].insert(0, notice)
+
+    ingame_news = {
+        "emergencynotice": {
+            "last_modified": response['emergencynotice']['lastModified'],
+        },
+        "battleroyale": {
+            "last_modified": response['battleroyalenews']['lastModified'],
+            "locale": response['battleroyalenews']['_locale'],
+            "news": response['battleroyalenews']['news']['messages']
+        },
+        "savetheworld": {
+            "last_modified": response['savetheworldnews']['lastModified'],
+            "locale": response['savetheworldnews']['_locale'],
+            "news": response['savetheworldnews']['news']['messages']
+        }
+    }
+
+    return ingame_news
 
 
 async def news_item_parse(news_item, font_title, font_body):
@@ -60,7 +96,7 @@ async def news(ignore_cache=False):
         if news_json and not ignore_cache:
             news_json = json.loads(news_json)
         else:
-            news_json = Fortnite.ingame_news()
+            news_json = parse_ingame_news()
             await Redis.execute("SET", "fortnite:news:json", json.dumps(news_json), "EX", 20)
 
         news_hash = sha1(str(
@@ -75,9 +111,7 @@ async def news(ignore_cache=False):
             news_file = NamedTemporaryFile(suffix=".png", delete=False)
 
             logging.info("Генерируется изображение текущих новостей.")
-            logging.debug("Изображение новостей сохраняется во временный файл: {0}.".format(
-                news_file.name)
-            )
+            logging.debug("Изображение новостей сохраняется во временный файл: {0}.".format(news_file.name))
 
             image = Image.new("RGBA", (5120, 10240), (35, 35, 35))
             draw = ImageDraw.Draw(image)

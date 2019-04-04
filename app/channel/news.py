@@ -3,7 +3,7 @@
 from app import logging
 from app import config
 from app.remote.redis import Redis
-from app.fortnite.parser.news import news as parse_news
+from app.fortnite.news import news as parse_news
 from app.utils import convert_to_moscow
 from pyrogram import InputMediaPhoto
 from itertools import zip_longest

@@ -2,7 +2,7 @@
 
 from app import logging
 from app.remote.redis import Redis
-from app.fortnite.parser.news import news as parse_news
+from app.fortnite.news import news as parse_news
 import logging
 import asyncio
 
