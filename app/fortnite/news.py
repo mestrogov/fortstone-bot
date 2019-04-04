@@ -21,8 +21,7 @@ def parse_ingame_news():
     # Парсирование экстренных сообщений для Королевской Битвы и Сражения с Бурей
     for notice_message in response['emergencynotice']['news']['messages']:
         notice = {
-            # TODO: Заменить на адекватную картинку со смыслом экстренности
-            "image": "https://cdn2.unrealengine.com/Fortnite/fortnite-game/battleroyalenews/v811/08BR_Social_The-Laguna-Legends_MOTD-1024x512-6710af6d031d4168eb3e16b4458267198c76e390.jpg",
+            "image": "https://i.imgur.com/9nGBW3U.jpg",
             "adspace": "ЭКСТРЕННОЕ СООБЩЕНИЕ!",
             "title": notice_message['title'],
             "body": notice_message['body'],
