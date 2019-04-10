@@ -48,8 +48,8 @@ async def post_async(client):
             assert news_channel['message_id']
             assert news_channel['time']
 
-            if int(time()) - int(news_channel['time']) < 14400:
-                logging.info("Последний пост с новостями был опубликован в канал меньше, чем 4 часа назад, поэтому "
+            if int(time()) - int(news_channel['time']) < 3600:
+                logging.info("Последний пост с новостями был опубликован в канал меньше, чем час назад, поэтому "
                              "сообщение было отредактировано обновленными новостями.")
 
                 message = client.edit_message_media(
