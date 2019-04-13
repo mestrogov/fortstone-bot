@@ -23,7 +23,9 @@ async def item_parse(item):
     image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
     try:
-        if item['images']['featured']:
+        if item['type'] == "emote":
+            raise Exception
+        elif item['images']['featured']:
             item_file.write(requests.get(item['images']['featured']).content)
         elif item['images']['png']:
             item_file.write(requests.get(item['images']['png']).content)

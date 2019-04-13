@@ -26,9 +26,10 @@ def parse_ingame_news():
             "title": notice_message['title'],
             "body": notice_message['body'],
         }
-        if notice_message['subgame'] == "stw":
+        try:
+            assert notice_message['subgame']
             response['savetheworldnews']['news']['messages'].insert(0, notice)
-        else:
+        except (AssertionError, KeyError, TypeError):
             response['battleroyalenews']['news']['messages'].insert(0, notice)
 
     ingame_news = {
