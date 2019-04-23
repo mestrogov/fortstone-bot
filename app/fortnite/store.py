@@ -16,19 +16,15 @@ import requests
 import asyncio
 
 
-async def item_parse(item):
+async def item_parse(item, featured=False):
     item_file = NamedTemporaryFile(suffix=".png", delete=False)
     logging.debug("Фотография предмета сохраняется во временный файл: {0}".format(item_file.name))
 
     image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
     try:
-        if item['type'] == "emote":
-            raise Exception
-        elif item['images']['featured']:
+        if featured and item['images']['featured']:
             item_file.write(requests.get(item['images']['featured']).content)
-        elif item['images']['png']:
-            item_file.write(requests.get(item['images']['png']).content)
         else:
             raise Exception
     except:
@@ -59,19 +55,19 @@ async def item_parse(item):
               (background_image_height - item_image_height) // 2)
     image.paste(item_image, offset, item_image)
 
-    # Делаем полупрозрачное выделение для названия предмета
+    # Делаем полупрозрачное выделение для названия и цены предмета
     s_image = Image.new("RGBA", (512, 512), (255, 0, 0, 0))
     s_image_draw = ImageDraw.Draw(s_image)
-    s_image_draw.rectangle(((0, 512 - 50), (512, 512 - 117)), fill=(0, 0, 0, 110))
+    s_image_draw.rectangle(((0, 512), (512, 400)), fill=(0, 0, 0, 110))
     image = Image.alpha_composite(image, s_image)
 
     # Необходимые переменные: название, цена предмета, шрифты
     item_name = item['name'].upper()
     item_cost = item['price']
     # Формула для вычисления необходимого размера шрифта: чем длиннее название, тем меньше шрифт
-    font_name_size = int(72 - 0.75 * (len(item_name)))
-    font_name = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", font_name_size)
-    font_cost = ImageFont.truetype("assets/fonts/BurbankBigCondensed-Bold.otf", 42)
+    font_name_size = int(56 - 0.80 * (len(item_name)))
+    font_name = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", font_name_size)
+    font_cost = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 48)
 
     # Получаем ширину, высоту названия и цены предмета
     draw = ImageDraw.Draw(image)
@@ -79,19 +75,16 @@ async def item_parse(item):
     item_cost_width, item_cost_height = draw.textsize(item_cost, font=font_cost)
 
     # Пишем название предмета на изображении
-    draw.text(xy=((512 - item_name_width) // 2, 512 - 110),
+    draw.text(xy=((512 - item_name_width) // 2, 400),
               text=item_name, fill=(255, 255, 255), font=font_name)
-
-    # Делаем выделение текста для цены
-    draw.rectangle(((0, 512), (512, 512 - 50)), fill=(7, 0, 35))
 
     # Вставляем иконку В-Баксов
     vbucks_image = Image.open("assets/icons/vbucks.png")
-    vbucks_image.thumbnail((42, 42), Image.ANTIALIAS)
-    image.paste(vbucks_image, ((512 - item_cost_width - 55) // 2, 512 - 46), vbucks_image)
+    vbucks_image.thumbnail((50, 50), Image.ANTIALIAS)
+    image.paste(vbucks_image, ((460 - item_cost_width) // 2, 455), vbucks_image)
 
     # Пишем цену предмета
-    draw.text(xy=((512 - item_cost_width + 41) // 2, 512 - 42),
+    draw.text(xy=((570 - item_cost_width) // 2, 450),
               text=item_cost, fil=(255, 255, 255), font=font_cost)
 
     # Делаем рамку в зависимости от редкости
@@ -169,7 +162,7 @@ async def store(ignore_cache=False):
             last_featured_item_location = [78, 468]
             for num, featured_item_json in enumerate(store_json['featured'], 1):
                 try:
-                    featured_item_image = Image.open(await item_parse(featured_item_json))
+                    featured_item_image = Image.open(await item_parse(featured_item_json, featured=True))
                     if num == 1:
                         image.paste(featured_item_image, tuple(last_featured_item_location))
                     elif num % 2 == 0:
