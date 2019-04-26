@@ -7,6 +7,7 @@ from app.remote.redis import Redis
 from app.fortnite.utils import store_colors
 from tempfile import NamedTemporaryFile
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from secrets import token_hex
 from hashlib import sha1
 from os.path import isfile
 import json
@@ -122,6 +123,9 @@ async def store(ignore_cache=False):
             store_json = store_json['data']
 
         store_hash = sha1(str(store_json['date']).encode("UTF-8")).hexdigest()
+        # Переменная, отвечающая за "правильность" генерации магазина. Если она равна False, то изображение кэшироваться
+        # не будет, а хэш магазина всегда будет рандомный, тем самым предовращает кэширование где-либо
+        shop_generated_successfully = True
 
         store_file = (await Redis.execute("GET", "fortnite:store:file:{0}".format(store_hash)))['details']
         if store_file and isfile(store_file) and not ignore_cache:
@@ -141,8 +145,7 @@ async def store(ignore_cache=False):
             shop_date = utils.convert_to_moscow(utils.convert_iso_time(store_json['date']))
             shop_text = "Магазин предметов в Фортнайте".upper()
             shop_ext = "{0} | Архивы Фортнайта".format(shop_date.strftime("%d.%m.%Y"))
-            # Технические переменные: шрифты, переменная, отвечающая за кэширование изображения
-            shop_generated_successfully = True
+            # Технические переменные: шрифты
             font_shop_text = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 80)
             font_shop_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 56)
             font_shop_category_names = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
@@ -215,11 +218,17 @@ async def store(ignore_cache=False):
 
             image.save(store_file.name, "PNG")
             store_file = store_file.name
-            # Проверяем, сгенерирован ли правильно/полностью магазин предметов. Если нет, то не кэшируем результат
+            # Проверяем, сгенерирован ли правильно/полностью магазин предметов. Если нет, то не кэшируем
+            # файл изображения
             if shop_generated_successfully:
                 await Redis.execute("SET", "fortnite:store:file:{0}".format(store_hash), store_file, "EX", 86400)
 
-        return store_file, store_hash
+        # Проверяем, сгенерирован ли правильно/полностью магазин предметов. Если нет, то возвращаем рандомный hash,
+        # чтобы предотвратить любое кэширование
+        if shop_generated_successfully:
+            return store_file, store_hash
+        else:
+            return store_file, token_hex(16)
     except Exception:
         logging.error("Произошла ошибка при генерации изображения магазина в Фортнайте.", exc_info=True)
         return "Произошла ошибка при генерации изображения магазина в Фортнайте."
