@@ -26,7 +26,7 @@ async def item_parse(item, featured=False):
     try:
         # Если изображения предмета пока что нет, то выдает ссылку на эти изображения
         unknown_placeholders = ["https://image.fnbr.co/misc/placeholder.png", "https://image.fnbr.co/misc/question.png"]
-        if item['images']['icon'] or item['images']['featured'] in unknown_placeholders:
+        if item['images']['icon'] in unknown_placeholders:
             # Возвращаем "с ошибкой", тем самым не даем сохранить в кэше неверное изображение магазина
             logging.error("У предмета нет иконки, поэтому следует немного подождать, пока она будет добавлена в API.")
             return "Предмет не имеет изображения, следует немного подождать, пока он будет добавлен в API."
