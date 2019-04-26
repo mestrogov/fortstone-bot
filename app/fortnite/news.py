@@ -97,7 +97,7 @@ async def news(ignore_cache=False):
             news_json = json.loads(news_json)
         else:
             news_json = parse_ingame_news()
-            await Redis.execute("SET", "fortnite:news:json", json.dumps(news_json), "EX", 20)
+            await Redis.execute("SET", "fortnite:news:json", json.dumps(news_json), "EX", 25)
 
         news_hash = sha1(str(
             news_json['battleroyale']['last_modified'] + news_json['savetheworld']['last_modified'] +

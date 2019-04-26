@@ -23,7 +23,13 @@ async def item_parse(item, featured=False):
     image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
     try:
-        if featured and item['images']['featured']:
+        # Если изображения предмета пока что нет, то выдает ссылку на эти изображения
+        unknown_placeholders = ["https://image.fnbr.co/misc/placeholder.png", "https://image.fnbr.co/misc/question.png"]
+        if item['images']['icon'] or item['images']['featured'] in unknown_placeholders:
+            # Возвращаем "с ошибкой", тем самым не даем сохранить в кэше неверное изображение магазина
+            logging.error("У предмета нет иконки, поэтому следует немного подождать, пока она будет добавлена в API.")
+            return "Предмет не имеет изображения, следует немного подождать, пока он будет добавлен в API."
+        elif featured and item['images']['featured']:
             item_file.write(requests.get(item['images']['featured']).content)
         else:
             raise Exception
@@ -65,7 +71,7 @@ async def item_parse(item, featured=False):
     item_name = item['name'].upper()
     item_cost = item['price']
     # Формула для вычисления необходимого размера шрифта: чем длиннее название, тем меньше шрифт
-    font_name_size = int(56 - 0.80 * (len(item_name)))
+    font_name_size = int(56 - 0.85 * (len(item_name)))
     font_name = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", font_name_size)
     font_cost = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 48)
 
@@ -105,7 +111,7 @@ async def store(ignore_cache=False):
             store_json = json.loads(store_json)
         else:
             store_json = requests.get(api_store_url, headers={"x-api-key": config.FNBR_API_KEY}).json()
-            await Redis.execute("SET", "fortnite:store:json", json.dumps(store_json), "EX", 20)
+            await Redis.execute("SET", "fortnite:store:json", json.dumps(store_json), "EX", 25)
 
         if not store_json['status'] == 200:
             logging.error("Произошла ошибка при получении текущего магазина. API вернуло неуспешный статус. {0}".format(
@@ -135,7 +141,8 @@ async def store(ignore_cache=False):
             shop_date = utils.convert_to_moscow(utils.convert_iso_time(store_json['date']))
             shop_text = "Магазин предметов в Фортнайте".upper()
             shop_ext = "{0} | Архивы Фортнайта".format(shop_date.strftime("%d.%m.%Y"))
-            # Технические переменные: шрифты
+            # Технические переменные: шрифты, переменная, отвечающая за кэширование изображения
+            shop_generated_successfully = True
             font_shop_text = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 80)
             font_shop_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 56)
             font_shop_category_names = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
@@ -172,7 +179,11 @@ async def store(ignore_cache=False):
                         last_featured_item_location = [last_featured_item_location[0] - 600, last_featured_item_location[1] + 600]
                         image.paste(featured_item_image, tuple(last_featured_item_location))
                 except:
-                    logging.error("Произошла ошибка при генерировании фотографии для рекомендуемого предмета.",
+                    # Вычитаем -1 из числа, ибо enumerate сам не отнимит (соответственно будет всегда +1, что неверно)
+                    num += -1
+                    shop_generated_successfully = False
+
+                    logging.error("Произошла ошибка при вставке/генерации изображения рекомендуемого предмета.",
                                   exc_info=True)
                     continue
 
@@ -190,7 +201,11 @@ async def store(ignore_cache=False):
                         last_daily_item_location = [last_daily_item_location[0] - 600, last_daily_item_location[1] + 600]
                         image.paste(daily_item, tuple(last_daily_item_location))
                 except:
-                    logging.error("Произошла ошибка при генерировании фотографии для ежедневного предмета.",
+                    # Вычитаем -1 из числа, ибо enumerate сам не отнимит (соответственно будет всегда +1, что неверно)
+                    num += -1
+                    shop_generated_successfully = False
+
+                    logging.error("Произошла ошибка при вставке/генерации изображения ежедневного предмета.",
                                   exc_info=True)
                     continue
 
@@ -200,7 +215,9 @@ async def store(ignore_cache=False):
 
             image.save(store_file.name, "PNG")
             store_file = store_file.name
-            await Redis.execute("SET", "fortnite:store:file:{0}".format(store_hash), store_file, "EX", 86400)
+            # Проверяем, сгенерирован ли правильно/полностью магазин предметов. Если нет, то не кэшируем результат
+            if shop_generated_successfully:
+                await Redis.execute("SET", "fortnite:store:file:{0}".format(store_hash), store_file, "EX", 86400)
 
         return store_file, store_hash
     except Exception:

@@ -23,7 +23,7 @@ def post(client):
         except Exception:
             logging.error("Произошла ошибка при публикации магазина в канал.", exc_info=True)
 
-        sleep(15)
+        sleep(30)
 
 
 # Делаем dict из list'а (метод HGETALL в Redis возвращает list); взято отсюда: https://stackoverflow.com/a/6900977
@@ -48,9 +48,9 @@ async def post_async(client):
             assert store_channel['message_id']
             assert store_channel['time']
 
-            if int(time()) - int(store_channel['time']) < 3600:
-                logging.info("Последний пост с магазином был опубликован в канал меньше, "
-                             "чем час назад, поэтому сообщение было отредактировано обновленным магазином.")
+            if int(time()) - int(store_channel['time']) < 7200:
+                logging.info("Последний пост с магазином был опубликован в канал меньше, чем 2 часа назад, поэтому "
+                             "сообщение было отредактировано обновленным магазином.")
 
                 message = client.edit_message_media(
                     int(store_channel['chat_id']), int(store_channel['message_id']),
@@ -62,10 +62,6 @@ async def post_async(client):
         except (AssertionError, TypeError, KeyError):
             message = client.send_photo(config.CHANNEL_ID, store_file, caption=store_caption)
 
-        await Redis.execute("HSET", "fortnite:store:channel", "hash", store_hash, "chat_id", message['chat']['id'],
-                            "message_id", message['message_id'], "time", int(time()))
-        await Redis.execute("EXPIRE", "fortnite:store:channel", 86400)
-
         client.send_poll(config.CHANNEL_ID, question="Оцените текущий магазин предметов в Фортнайте.",
                          options=[
                              "👍 Мне нравится весь магазин предметов",
@@ -73,3 +69,7 @@ async def post_async(client):
                              "😐 Мне нравятся некоторые предметы",
                              "👎 Мне не нравится весь магазин предметов"
                          ], disable_notification=True)
+
+        await Redis.execute("HSET", "fortnite:store:channel", "hash", store_hash, "chat_id", message['chat']['id'],
+                            "message_id", message['message_id'], "time", int(time()))
+        await Redis.execute("EXPIRE", "fortnite:store:channel", 172800)

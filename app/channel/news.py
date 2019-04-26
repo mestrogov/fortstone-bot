@@ -23,7 +23,7 @@ def post(client):
         except Exception:
             logging.error("Произошла ошибка при публикации новостей в канал.", exc_info=True)
 
-        sleep(15)
+        sleep(30)
 
 
 # Делаем dict из list'а (метод HGETALL в Redis возвращает list); взято отсюда: https://stackoverflow.com/a/6900977
@@ -64,4 +64,4 @@ async def post_async(client):
 
         await Redis.execute("HSET", "fortnite:news:channel", "hash", news_hash, "chat_id", message['chat']['id'],
                             "message_id", message['message_id'], "time", int(time()))
-        await Redis.execute("EXPIRE", "fortnite:news:channel", 604800)
+        await Redis.execute("EXPIRE", "fortnite:news:channel", 432000)
