@@ -228,6 +228,7 @@ async def store(ignore_cache=False):
         if shop_generated_successfully:
             return store_file, store_hash
         else:
+            logging.info("Магазин предметов был сгенерирован неполностью, поэтому хэш генерируется рандомный.")
             return store_file, token_hex(16)
     except Exception:
         logging.error("Произошла ошибка при генерации изображения магазина в Фортнайте.", exc_info=True)
