@@ -62,13 +62,13 @@ async def post_async(client):
         except (AssertionError, TypeError, KeyError):
             message = client.send_photo(config.CHANNEL_ID, store_file, caption=store_caption)
 
-        client.send_poll(config.CHANNEL_ID, question="Оцените текущий магазин предметов в Фортнайте.",
-                         options=[
-                             "👍 Мне нравится весь магазин предметов",
-                             "🙂 Мне нравится большинство предметов",
-                             "😐 Мне нравятся некоторые предметы",
-                             "👎 Мне не нравится весь магазин предметов"
-                         ], disable_notification=True)
+            client.send_poll(config.CHANNEL_ID, question="Оцените текущий магазин предметов в Фортнайте.",
+                             options=[
+                                 "👍 Мне нравится весь магазин предметов",
+                                 "🙂 Мне нравится большинство предметов",
+                                 "😐 Мне нравятся некоторые предметы",
+                                 "👎 Мне не нравится весь магазин предметов"
+                             ], disable_notification=True)
 
         await Redis.execute("HSET", "fortnite:store:channel", "hash", store_hash, "chat_id", message['chat']['id'],
                             "message_id", message['message_id'], "time", int(time()))
