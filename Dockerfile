@@ -1,4 +1,4 @@
-FROM python:3.7.2-slim
+FROM python:3.7-slim
 MAINTAINER Yaroslav <hello@unimarijo.com>
 ENV INSTALL_PATH /data
 
