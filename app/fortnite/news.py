@@ -28,6 +28,7 @@ def parse_ingame_news():
         }
         try:
             assert notice_message['subgame']
+            # TODO: "subgame" в некоторых редких случаях может быть "br", исправить
             response['savetheworldnews']['news']['messages'].insert(0, notice)
         except (AssertionError, KeyError, TypeError):
             response['battleroyalenews']['news']['messages'].insert(0, notice)

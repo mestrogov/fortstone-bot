@@ -13,18 +13,18 @@ from app.telegram.handlers.message import message as message_handler
 def get_client():
     try:
         client = Client(session_name=config.BOT_TOKEN, api_id=config.API_ID, api_hash=config.API_HASH,
-                        app_version="FortniteArchives v{0}".format(config.VERSION))
+                        app_version="Fortstone Bot v{0}".format(config.VERSION))
 
         client.add_handler(MessageHandler(start_command,
-                                          Filters.command(["start", "start@fnarchivesbot"])))
+                                          Filters.command(["start", "start@fortstonebot"])))
         client.add_handler(MessageHandler(debug_command,
-                                          Filters.command(["debug", "debug@fnarchivesbot"])))
+                                          Filters.command(["debug", "debug@fortstonebot"])))
         client.add_handler(MessageHandler(status_command,
-                                          Filters.command(["status", "status@fnarchivesbot"])))
+                                          Filters.command(["status", "status@fortstonebot"])))
         client.add_handler(MessageHandler(store_command,
-                                          Filters.command(["store", "store@fnarchivesbot"])))
+                                          Filters.command(["store", "store@fortstonebot"])))
         client.add_handler(MessageHandler(news_command,
-                                          Filters.command(["news", "news@fnarchivesbot"])))
+                                          Filters.command(["news", "news@fortstonebot"])))
         # Этот MessageHandler должен быть обязательно последним
         client.add_handler(MessageHandler(message_handler))
 
