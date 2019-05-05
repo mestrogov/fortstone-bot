@@ -21,15 +21,19 @@ async def item_parse(item, featured=False):
     item_file = NamedTemporaryFile(suffix=".png", delete=False)
     logging.debug("Фотография предмета сохраняется во временный файл: {0}".format(item_file.name))
 
+    # Обозначает полноту изображения предмета (т.е. например: есть или нет иконки)
+    error_status = False
     image = Image.new("RGBA", (512, 512), (255, 0, 0))
 
     try:
         # Если изображения предмета пока что нет, то выдает ссылку на эти изображения
         unknown_placeholders = ["https://image.fnbr.co/misc/placeholder.png", "https://image.fnbr.co/misc/question.png"]
         if item['images']['icon'] in unknown_placeholders:
-            # Возвращаем "с ошибкой", тем самым не даем сохранить в кэше неверное изображение магазина
-            logging.error("У предмета нет иконки, поэтому следует немного подождать, пока она будет добавлена в API.")
-            return "Предмет не имеет изображения, следует немного подождать, пока он будет добавлен в API."
+            logging.info("У предмета нет иконки, поэтому следует немного подождать, пока она будет добавлена в API.")
+            error_status = True
+
+            # Вызываем Exception, чтобы получить иконку предмета
+            raise Exception
         elif featured and item['images']['featured']:
             item_file.write(requests.get(item['images']['featured']).content)
         else:
@@ -98,7 +102,7 @@ async def item_parse(item, featured=False):
     image = ImageOps.expand(image, border=5, fill=store_colors.get_frame_border_color(item['rarity']))
 
     image.save(item_file.name, "PNG")
-    return item_file.name
+    return item_file.name, error_status
 
 
 async def store(ignore_cache=False):
@@ -172,20 +176,19 @@ async def store(ignore_cache=False):
             last_featured_item_location = [78, 468]
             for num, featured_item_json in enumerate(store_json['featured'], 1):
                 try:
-                    featured_item_image = Image.open(await item_parse(featured_item_json, featured=True))
+                    featured_item_image, error_status = await item_parse(featured_item_json, featured=True)
+                    if error_status:
+                        shop_generated_successfully = False
+
                     if num == 1:
-                        image.paste(featured_item_image, tuple(last_featured_item_location))
+                        image.paste(Image.open(featured_item_image), tuple(last_featured_item_location))
                     elif num % 2 == 0:
                         last_featured_item_location[0] = last_featured_item_location[0] + 600
-                        image.paste(featured_item_image, tuple(last_featured_item_location))
+                        image.paste(Image.open(featured_item_image), tuple(last_featured_item_location))
                     else:
                         last_featured_item_location = [last_featured_item_location[0] - 600, last_featured_item_location[1] + 600]
-                        image.paste(featured_item_image, tuple(last_featured_item_location))
+                        image.paste(Image.open(featured_item_image), tuple(last_featured_item_location))
                 except:
-                    # Вычитаем -1 из числа, ибо enumerate сам не отнимит (соответственно будет всегда +1, что неверно)
-                    num += -1
-                    shop_generated_successfully = False
-
                     logging.error("Произошла ошибка при вставке/генерации изображения рекомендуемого предмета.",
                                   exc_info=True)
                     continue
@@ -194,20 +197,19 @@ async def store(ignore_cache=False):
             last_daily_item_location = [1500, 468]
             for num, daily_item_json in enumerate(store_json['daily'], 1):
                 try:
-                    daily_item = Image.open(await item_parse(daily_item_json))
+                    daily_item, error_status = await item_parse(daily_item_json)
+                    if error_status:
+                        shop_generated_successfully = False
+
                     if num == 1:
-                        image.paste(daily_item, tuple(last_daily_item_location))
+                        image.paste(Image.open(daily_item), tuple(last_daily_item_location))
                     elif num % 2 == 0:
                         last_daily_item_location[0] = last_daily_item_location[0] + 600
-                        image.paste(daily_item, tuple(last_daily_item_location))
+                        image.paste(Image.open(daily_item), tuple(last_daily_item_location))
                     else:
                         last_daily_item_location = [last_daily_item_location[0] - 600, last_daily_item_location[1] + 600]
-                        image.paste(daily_item, tuple(last_daily_item_location))
+                        image.paste(Image.open(daily_item), tuple(last_daily_item_location))
                 except:
-                    # Вычитаем -1 из числа, ибо enumerate сам не отнимит (соответственно будет всегда +1, что неверно)
-                    num += -1
-                    shop_generated_successfully = False
-
                     logging.error("Произошла ошибка при вставке/генерации изображения ежедневного предмета.",
                                   exc_info=True)
                     continue
@@ -228,7 +230,7 @@ async def store(ignore_cache=False):
         if shop_generated_successfully:
             return store_file, store_hash
         else:
-            logging.info("Магазин предметов был сгенерирован неполностью, поэтому хэш генерируется рандомный.")
+            logging.info("Магазин предметов был сгенерирован неполностью, поэтому хэш магазина рандомный.")
             return store_file, token_hex(16)
     except Exception:
         logging.error("Произошла ошибка при генерации изображения магазина в Фортнайте.", exc_info=True)
