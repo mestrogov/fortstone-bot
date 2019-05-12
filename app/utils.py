@@ -17,3 +17,25 @@ def convert_iso_time(isotime):
 
 def convert_to_moscow(utctime):
     return pytz.utc.localize(utctime).astimezone(pytz.timezone("Europe/Moscow"))
+
+
+def convert_date_into_words(date):
+    months_translated_dict = {
+        "January": "Января",
+        "February": "Февраля",
+        "March": "Марта",
+        "April": "Апреля",
+        "May": "Мая",
+        "June": "Июня",
+        "July": "Июля",
+        "August": "Августа",
+        "September": "Сентября",
+        "October": "Октября",
+        "November": "Ноября",
+        "December": "Декабря"
+    }
+
+    date = date.strftime("%d %B %Y").split(" ")
+    date[1] = date[1].replace(date[1], months_translated_dict[date[1]])
+
+    return "{0} года".format(" ".join(date))

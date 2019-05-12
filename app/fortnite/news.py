@@ -28,8 +28,11 @@ def parse_ingame_news():
         }
         try:
             assert notice_message['subgame']
-            # TODO: "subgame" в некоторых редких случаях может быть "br", исправить
-            response['savetheworldnews']['news']['messages'].insert(0, notice)
+
+            if notice_message['subgame'] == "br":
+                raise AssertionError
+            else:
+                response['savetheworldnews']['news']['messages'].insert(0, notice)
         except (AssertionError, KeyError, TypeError):
             response['battleroyalenews']['news']['messages'].insert(0, notice)
 
@@ -118,8 +121,8 @@ async def news(ignore_cache=False):
             draw = ImageDraw.Draw(image)
 
             # Переменные для изменения текста на изображении
-            news_header_text = "Внутриигровые новости в Фортнайте".upper()
-            news_ext_text = "Больше новостей в нашей группе ВКонтакте или канале Telegram"
+            news_header_text = "Внутриигровые новости".upper()
+            news_ext_text = "Больше новостей о Фортнайте в нашей группе ВКонтакте или канале Telegram"
             category_last_update_date_text = "Обновление новостей {0} произошло {1} в {2} по московскому времени"
             # Технические переменные: шрифты, время
             br_news_date = utils.convert_to_moscow(utils.convert_iso_time(news_json['battleroyale']['last_modified']))
@@ -185,8 +188,8 @@ async def news(ignore_cache=False):
 
         return news_file, news_hash
     except Exception:
-        logging.error("Произошла ошибка при генерации изображения текущих новостей в Фортнайте.", exc_info=True)
-        return "Произошла ошибка при генерации изображения текущих новостей в Фортнайте."
+        logging.error("Произошла ошибка при генерации изображения текущих внутриигровых.", exc_info=True)
+        return "Произошла ошибка при генерации изображения текущих внутриигровых."
 
 if __name__ == "__main__":
     try:

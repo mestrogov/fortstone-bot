@@ -147,8 +147,8 @@ async def store(ignore_cache=False):
 
             # Переменные для изменения текста на изображении
             shop_date = utils.convert_to_moscow(utils.convert_iso_time(store_json['date']))
-            shop_text = "Магазин предметов в Фортнайте".upper()
-            shop_ext = "{0} | Архивы Фортнайта".format(shop_date.strftime("%d.%m.%Y"))
+            shop_text = "Магазин предметов от {0}".format(utils.convert_date_into_words(shop_date)).upper()
+            shop_ext = "Больше новостей о Фортнайте в нашей группе ВКонтакте или канале Telegram"
             # Технические переменные: шрифты
             font_shop_text = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 80)
             font_shop_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 56)
@@ -230,11 +230,11 @@ async def store(ignore_cache=False):
         if shop_generated_successfully:
             return store_file, store_hash
         else:
-            logging.info("Магазин предметов был сгенерирован неполностью, поэтому хэш магазина рандомный.")
+            logging.info("Изображение магазина предметов был сгенерирован неполностью, поэтому хэш магазина рандомный.")
             return store_file, token_hex(16)
     except Exception:
-        logging.error("Произошла ошибка при генерации изображения магазина в Фортнайте.", exc_info=True)
-        return "Произошла ошибка при генерации изображения магазина в Фортнайте."
+        logging.error("Произошла ошибка при генерации изображения магазина.", exc_info=True)
+        return "Произошла ошибка при генерации изображения магазина."
 
 if __name__ == "__main__":
     try:

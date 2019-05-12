@@ -40,7 +40,7 @@ async def post_async(client):
                           "сообщения были обновлены в {} по московскому времени.__"
 
     if not news_channel or news_channel['hash'] != news_hash:
-        logging.info("Новости в Фортнайте были обновлены. Публикуется их изображение в канал, "
+        logging.info("Внутриигровые были обновлены. Публикуется их изображение в канал, "
                      "указанный в конфигурационном файле.")
 
         try:
@@ -52,16 +52,17 @@ async def post_async(client):
                 logging.info("Последний пост с новостями был опубликован в канал меньше, чем 2 часа назад, поэтому "
                              "сообщение было отредактировано обновленными новостями.")
 
-                message = client.edit_message_media(
-                    int(news_channel['chat_id']), int(news_channel['message_id']),
-                    media=InputMediaPhoto(news_file, caption=news_caption_edited.format(
-                        convert_to_moscow(datetime.utcnow()).strftime("%H:%M:%S")
-                    )))
+                client.edit_message_media(int(news_channel['chat_id']), int(news_channel['message_id']),
+                                          media=InputMediaPhoto(news_file, caption=news_caption_edited.format(
+                                              convert_to_moscow(datetime.utcnow()).strftime("%H:%M:%S")))
+                                          )
+
+                await Redis.execute("HSET", "fortnite:news:channel", "hash", news_hash)
             else:
                 raise AssertionError
         except (AssertionError, TypeError, KeyError):
             message = client.send_photo(config.CHANNEL_ID, news_file, caption=news_caption)
 
-        await Redis.execute("HSET", "fortnite:news:channel", "hash", news_hash, "chat_id", message['chat']['id'],
-                            "message_id", message['message_id'], "time", int(time()))
-        await Redis.execute("EXPIRE", "fortnite:news:channel", 432000)
+            await Redis.execute("HSET", "fortnite:news:channel", "hash", news_hash, "chat_id", message['chat']['id'],
+                                "message_id", message['message_id'], "time", int(time()))
+            await Redis.execute("EXPIRE", "fortnite:news:channel", 432000)
