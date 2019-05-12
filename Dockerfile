@@ -5,6 +5,6 @@ ENV INSTALL_PATH /data
 COPY . $INSTALL_PATH
 WORKDIR $INSTALL_PATH
 
-RUN pip install -r requirements/requirements.txt
+RUN pip install -r requirements.txt
 
 CMD python run.py
