@@ -147,8 +147,10 @@ async def store(ignore_cache=False):
 
             # Переменные для изменения текста на изображении
             shop_date = utils.convert_to_moscow(utils.convert_iso_time(store_json['date']))
-            shop_text = "Магазин предметов от {0}".format(utils.convert_date_into_words(shop_date)).upper()
-            shop_ext = "Больше новостей о Фортнайте в нашей группе ВКонтакте или канале Telegram"
+            shop_text = "Магазин предметов".upper()
+            shop_ext = "Обновление магазина предметов произошло {0} в {1} по московскому времени.".format(
+                shop_date.strftime("%d.%m.%Y"), shop_date.strftime("%H:%M")
+            )
             # Технические переменные: шрифты
             font_shop_text = ImageFont.truetype("assets/fonts/Montserrat-Black.ttf", 80)
             font_shop_ext = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 56)

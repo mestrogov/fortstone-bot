@@ -72,12 +72,12 @@ async def news_item_parse(news_item, font_title, font_body):
     # Вставляем изображение новости и рисуем рамку
     news_item_image = Image.open(news_item_file.name)
     news_item_image.thumbnail((1024, 512), Image.ANTIALIAS)
-    news_item_image = ImageOps.expand(news_item_image, border=5, fill=(255, 255, 255))
+    news_item_image = ImageOps.expand(news_item_image, border=5, fill=(177, 177, 177))
     image.paste(news_item_image, (0, 0))
 
     # Рисуем рамку для новости и выделяем цветом место текста (тела и заголовка) новости
     draw.rectangle(((1029, 0), (2359, 521)),
-                   width=5, outline=(255, 255, 255), fill=(50, 50, 50))
+                   width=5, outline=(177, 177, 177), fill=(50, 50, 50))
     # Выделяем цветом название новости
     draw.rectangle(((1034, 5), (2354, 106)), fill=(25, 25, 38))
 
