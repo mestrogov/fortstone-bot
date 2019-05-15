@@ -19,22 +19,25 @@ def parse_ingame_news():
     response = requests.get(news_api_url, headers={"Accept-Language": "ru"}).json()
 
     # Парсирование экстренных сообщений для Королевской Битвы и Сражения с Бурей
-    for notice_message in response['emergencynotice']['news']['messages']:
-        notice = {
-            "image": "https://i.imgur.com/9nGBW3U.jpg",
-            "adspace": "ЭКСТРЕННОЕ СООБЩЕНИЕ!",
-            "title": notice_message['title'],
-            "body": notice_message['body'],
-        }
-        try:
-            assert notice_message['subgame']
+    try:
+        for notice_message in response['emergencynotice']['news']['messages']:
+            notice = {
+                "image": "https://i.imgur.com/9nGBW3U.jpg",
+                "adspace": "ЭКСТРЕННОЕ СООБЩЕНИЕ!",
+                "title": notice_message['title'],
+                "body": notice_message['body'],
+            }
+            try:
+                assert notice_message['subgame']
 
-            if notice_message['subgame'] == "br":
-                raise AssertionError
-            else:
-                response['savetheworldnews']['news']['messages'].insert(0, notice)
-        except (AssertionError, KeyError, TypeError):
-            response['battleroyalenews']['news']['messages'].insert(0, notice)
+                if notice_message['subgame'] == "br":
+                    raise AssertionError
+                else:
+                    response['savetheworldnews']['news']['messages'].insert(0, notice)
+            except (AssertionError, KeyError, TypeError):
+                response['battleroyalenews']['news']['messages'].insert(0, notice)
+    except (KeyError, TypeError):
+        logging.info("В новостях нет никаких экстренных сообщений, генерация обычных новостей.")
 
     ingame_news = {
         "emergencynotice": {
