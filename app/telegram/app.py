@@ -12,8 +12,7 @@ from app.telegram.handlers.message import message as message_handler
 
 def get_client():
     try:
-        client = Client(session_name=config.BOT_TOKEN, api_id=config.API_ID, api_hash=config.API_HASH,
-                        app_version="Fortstone Bot v{0}".format(config.VERSION))
+        client = Client("Fortstone Bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
 
         client.add_handler(MessageHandler(start_command,
                                           Filters.command(["start", "start@fortstonebot"])))
