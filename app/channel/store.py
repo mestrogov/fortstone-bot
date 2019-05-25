@@ -62,7 +62,7 @@ async def post_async(client):
                 raise AssertionError
         except (AssertionError, TypeError, KeyError):
             message = client.send_photo(config.CHANNEL_ID, store_file, caption=store_caption)
-            client.send_poll(config.CHANNEL_ID, question="Оцените текущий магазин предметов",
+            client.stop_poll(config.CHANNEL_ID, question="Оцените текущий магазин предметов",
                              options=[
                                  "👍 Мне нравится магазин предметов",
                                  "👎 Мне не нравится магазин предметов"
